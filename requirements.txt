@@ -1,0 +1,8 @@
+fastapi
+uvicorn
+pandas
+openpyxl
+python-pptx
+pytesseract
+opencv-python
+pillow

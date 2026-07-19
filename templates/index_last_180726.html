@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enterprise Spreadsheet Pro</title>
+    <style>
+        :root {
+            --primary: #107c41;
+            --primary-hover: #0f6f3a;
+            --surface: #ffffff;
+            --background: #f8fafc;
+            --panel-border: #cbd5e1;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --cell-border: #e2e8f0;
+            --header-bg: #f1f5f9;
+            --selected-bg: #e2f0d9;
+            --radius: 6px;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            font-size: 13px; color: var(--text-main); background-color: var(--background);
+            height: 100vh; display: flex; overflow: hidden;
+        }
+
+        .Ank-Ldb-Container {
+            width: 100vw; height: 100vh; display: flex; flex-direction: column; background-color: var(--surface);
+        }
+
+        /* Toolbar Top Action Hub Bar */
+        .Ank19-Toolbar {
+            padding: 12px 20px; background-color: var(--surface); border-bottom: 1px solid var(--panel-border);
+            display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between;
+            box-shadow: var(--shadow); z-index: 10;
+        }
+
+        .Toolbar-Group { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+
+        .file-upload-wrapper { position: relative; display: inline-block; }
+        input[type="file"]#excelFile { position: absolute; left: 0; top: 0; opacity: 0; width: 100%; height: 100%; cursor: pointer; }
+        .custom-file-btn {
+            display: inline-flex; padding: 8px 14px; background-color: #f1f5f9;
+            border: 1px solid var(--panel-border); border-radius: var(--radius); font-weight: 500;
+        }
+
+        button {
+            padding: 8px 14px; font-weight: 500; font-size: 13px; border-radius: var(--radius);
+            border: 1px solid var(--panel-border); background: var(--surface); cursor: pointer;
+            display: inline-flex; align-items: center; justify-content: center; gap: 4px; transition: all 0.15s ease;
+        }
+        button.btn-primary { background-color: var(--primary); color: white; border-color: transparent; }
+        button.btn-primary:hover { background-color: var(--primary-hover); }
+        button.btn-action:hover { background-color: #f1f5f9; border-color: #94a3b8; }
+        button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        /* Document Table Workspace Model Outer Wrapper Area */
+        .ADPro-Grid-Wrapper {
+            flex: 1; width: 100%; overflow: auto; background-color: var(--surface); position: relative;
+        }
+
+        /* Modern Table Canvas Layout Component Grid System (No Absolute Pixel Coordinate Overflows) */
+        .ADPro-Grid-Container {
+            display: grid;
+            width: 100%;
+            background-color: var(--cell-border);
+            grid-auto-rows: 36px;
+        }
+
+        .cell {
+            background: var(--surface); padding: 8px 12px; display: flex; align-items: center;
+            border-right: 1px solid var(--cell-border); border-bottom: 1px solid var(--cell-border);
+            overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px;
+        }
+        
+        /* Table Headers Styling Rules */
+        .cell.table-header {
+            background-color: var(--header-bg); font-weight: 600; color: var(--text-main);
+            position: sticky; top: 0; z-index: 5; border-bottom: 2px solid var(--panel-border);
+        }
+        
+        .cell.selected { background-color: var(--selected-bg); outline: 1px solid var(--primary); }
+        .cell.style-bold { font-weight: bold; }
+        .cell.style-header-tint { background-color: #e2f0d9; color: #107c41; font-weight: bold; }
+
+        .hidden-editor {
+            position: absolute; display: none; z-index: 100; border: 2px solid var(--primary);
+            border-radius: var(--radius); padding: 4px 8px; font-family: inherit; font-size: 13px; outline: none;
+        }
+
+        /* Bottom Application Pagination Control Panel Elements */
+        .Ank19-Pagination-Bar {
+            padding: 10px 20px; background-color: #f8fafc; border-top: 1px solid var(--panel-border);
+            display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;
+        }
+        .pagination-info { color: var(--text-muted); font-size: 13px; }
+
+        @media (max-width: 768px) {
+            .Ank19-Toolbar { flex-direction: column; align-items: stretch; padding: 10px; }
+            .Toolbar-Group { width: 100%; justify-content: space-between; }
+            button, .custom-file-btn { flex: 1; text-align: center; }
+            .Ank19-Pagination-Bar { flex-direction: column; text-align: center; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="Ank-Ldb-Container" id="AnkD0-Root">
+    <div class="Ank19-Toolbar">
+        <div class="Toolbar-Group">
+            <div class="file-upload-wrapper">
+                <div class="custom-file-btn">Choose Document</div>
+                <input type="file" id="excelFile" accept=".csv,.xlsx" onchange="this.previousElementSibling.textContent = this.files[0]?.name || 'Choose Document'" />
+            </div>
+            <button class="btn-primary" onclick="handleUpload()">Upload</button>
+        </div>
+        
+        <!-- Structural Matrix Modification Controls Panel Options -->
+        <div class="Toolbar-Group">
+            <button class="btn-action" onclick="Ank19_Mutator.insertRow()" title="Insert new data row at active focus pointer">➕ Row</button>
+            <button class="btn-action" onclick="Ank19_Mutator.deleteRow()" title="Delete active targeted structural data row">❌ Row</button>
+            <button class="btn-action" onclick="Ank19_Mutator.toggleHeaderStyle()" title="Apply dynamic formatting style keys to selected items">🎨 Header Style</button>
+            <button class="btn-action" onclick="AD_Export()">Export Excel</button>
+            <button class="btn-action" onclick="AD_Export_PPT()">Export PPT</button>
+        </div>
+    </div>
+    
+    <input id="Ank19-CellEditor" class="hidden-editor" type="text" />
+
+    <div class="ADPro-Grid-Wrapper" id="Ank-Viewport-Wrapper">
+        <div class="ADPro-Grid-Container" id="Ank-Viewport"></div>
+    </div>
+
+    <div class="Ank19-Pagination-Bar">
+        <div class="pagination-info" id="paginationInfo">
+            Showing records <strong>0</strong> - <strong>0</strong> of <strong>0</strong> (Header Offset detected: <strong id="offsetLabel">0</strong>)
+        </div>
+        <div class="pagination-info">Click rows to select target cell pathways. Double-click items to inline edit keys.</div>
+    </div>
+</div>
+
+<script>
+let CURRENT_WB_ID = null;
+let Ank19_Worker = null;
+let latestRequestId = 0;
+let rowOffsetServer = 0;
+
+const Ank19_State = {
+    data: {},
+    styles: {}, // Persistent metadata container maps style layouts downstream
+    meta: { rows: 0, cols: 0 },
+    
+    getCell: (r, c) => Ank19_State.data[`${r}-${c}`] || { v: "", s: {} },
+    getCellStyle: (r, c) => Ank19_State.styles[`${r}-${c}`] || {},
+    
+    setCellRaw: (r, c, val) => {
+        Ank19_State.data[`${r}-${c}`] = { ...Ank19_State.getCell(r, c), v: val };
+    },
+    
+    setCell: (r, c, val) => {
+        Ank19_State.setCellRaw(r, c, val);
+        Ank19_EventBus.emit('dataChanged', { r, c });
+    },
+    
+    setCellStyle: (r, c, styleObj) => {
+        Ank19_State.styles[`${r}-${c}`] = { ...Ank19_State.getCellStyle(r, c), ...styleObj };
+        Ank19_EventBus.emit('dataChanged', { r, c });
+    }
+};
+
+const Ank19_DataManager = {
+    loadingChunks: new Set(),
+    loadedChunks: new Set(),
+
+    isChunkLoaded(row) {
+        return this.loadedChunks.has(`${Math.floor(row / 50) * 50}`);
+    },
+
+    requestChunk(row) {
+        if (!CURRENT_WB_ID) return;
+        const chunkStart = Math.floor(row / 50) * 50;
+        const chunkKey = `${chunkStart}`;
+        if (this.loadedChunks.has(chunkKey) || this.loadingChunks.has(chunkKey)) return;
+
+        this.loadingChunks.add(chunkKey);
+        initWorker();
+        Ank19_Worker.postMessage({
+            action: 'FETCH_ROWS',
+            payload: { id: CURRENT_WB_ID, start: chunkStart, count: 50, offset: rowOffsetServer },
+            reqId: ++latestRequestId
+        });
+    },
+
+    markLoaded(start) {
+        this.loadedChunks.add(`${start}`);
+        this.loadingChunks.delete(`${start}`);
+    }
+};
+
+const workerBlob = new Blob([`
+    self.onmessage = async (e) => {
+        const { action, payload, reqId } = e.data;
+        if (action === 'FETCH_ROWS') {
+            try {
+                const res = await fetch('/api/workbook/' + payload.id + '/rows?start=' + payload.start + '&count=' + payload.count + '&offset=' + payload.offset);
+                const json = await res.json();
+                self.postMessage({ type: 'DATA_READY', rows: json.rows, start: payload.start, reqId: reqId });
+            } catch (err) { console.error("Worker process pipeline execution down:", err); }
+        }
+    };
+`], { type: 'application/javascript' });
+
+function initWorker() {
+    if (!Ank19_Worker) {
+        const workerURL = URL.createObjectURL(workerBlob);
+        Ank19_Worker = new Worker(workerURL);
+        URL.revokeObjectURL(workerURL);
+
+        Ank19_Worker.onmessage = (e) => {
+            if (e.data.type === 'DATA_READY') {
+                const { rows, start, reqId } = e.data;
+                if (reqId && reqId < latestRequestId) return;
+                
+                rows.forEach((rowData, rOffset) => {
+                    rowData.forEach((val, cOffset) => {
+                        Ank19_State.setCellRaw(start + rOffset, cOffset, val);
+                    });
+                });
+                Ank19_DataManager.markLoaded(start);
+                Ank19_Renderer.requestRender();
+            }
+        };
+    }
+}
+
+const debounce = (fn, delay) => {
+    let timeoutId;
+    return (...args) => {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => fn(...args), delay);
+    };
+};
+const debouncedRequestChunk = debounce((r) => Ank19_DataManager.requestChunk(r), 100);
+
+async function handleUpload() {
+    const fileInput = document.getElementById('excelFile');
+    const uploadBtn = document.querySelector('button[onclick="handleUpload()"]');
+    if (!fileInput?.files[0]) return alert("Please select a file path asset target first.");
+
+    uploadBtn.textContent = "Processing...";
+    uploadBtn.disabled = true;
+
+    const formData = new FormData();
+    formData.append("file", fileInput.files[0]);
+
+    try {
+        const response = await fetch('/api/upload', { method: 'POST', body: formData });
+        const result = await response.json();
+        
+        if (response.ok && result.workbook_id) {
+            CURRENT_WB_ID = result.workbook_id;
+            rowOffsetServer = result.meta.offset || 0;
+            
+            document.getElementById('offsetLabel').textContent = rowOffsetServer;
+            
+            Ank19_State.meta.rows = result.meta.rows || 100;
+            Ank19_State.meta.cols = result.meta.cols || 10;
+            
+            Ank19_DataManager.loadedChunks.clear();
+            Ank19_DataManager.loadingChunks.clear();
+            Ank19_State.data = {};
+            Ank19_State.styles = {};
+            
+            Ank19_Selection.reset();
+            Ank19_DataManager.requestChunk(0);
+            Ank19_Renderer.requestRender();
+        } else {
+            throw new Error(result.detail || "Server pipeline transaction failure.");
+        }
+    } catch (error) {
+        alert("System Error: " + error.message);
+    } finally {
+        uploadBtn.textContent = "Upload";
+        uploadBtn.disabled = false;
+    }
+}
+
+/* Mutator Layer to Handle Structural Manipulations Safely */
+const Ank19_Mutator = {
+    insertRow() {
+        const activeRow = Ank19_Selection.current.activeRow;
+        const totalRows = Ank19_State.meta.rows;
+        const totalCols = Ank19_State.meta.cols;
+        
+        // Shift data down starting from the end down to the active selected row pointer
+        for (let r = totalRows - 1; r >= activeRow; r--) {
+            for (let c = 0; c < totalCols; c++) {
+                Ank19_State.data[`${r + 1}-${c}`] = Ank19_State.data[`${r}-${c}`];
+                Ank19_State.styles[`${r + 1}-${c}`] = Ank19_State.styles[`${r}-${c}`];
+            }
+        }
+        
+        // Clear value indexes across newly added structural slots
+        for (let c = 0; c < totalCols; c++) {
+            Ank19_State.data[`${activeRow}-${c}`] = { v: "" };
+            delete Ank19_State.styles[`${activeRow}-${c}`];
+        }
+        
+        Ank19_State.meta.rows++;
+        Ank19_Renderer.requestRender();
+    },
+
+    deleteRow() {
+        const activeRow = Ank19_Selection.current.activeRow;
+        const totalRows = Ank19_State.meta.rows;
+        const totalCols = Ank19_State.meta.cols;
+        
+        if (totalRows <= 1) return;
+        
+        // Shift underlying nodes up
+        for (let r = activeRow; r < totalRows - 1; r++) {
+            for (let c = 0; c < totalCols; c++) {
+                Ank19_State.data[`${r}-${c}`] = Ank19_State.data[`${r + 1}-${c}`];
+                Ank19_State.styles[`${r}-${c}`] = Ank19_State.styles[`${r + 1}-${c}`];
+            }
+        }
+        
+        // Clean out index trailing boundary artifacts
+        for (let c = 0; c < totalCols; c++) {
+            delete Ank19_State.data[`${totalRows - 1}-${c}`];
+            delete Ank19_State.styles[`${totalRows - 1}-${c}`];
+        }
+        
+        Ank19_State.meta.rows--;
+        Ank19_Selection.current.activeRow = Math.max(0, activeRow - 1);
+        Ank19_Renderer.requestRender();
+    },
+    
+    toggleHeaderStyle() {
+        const { activeRow, activeCol } = Ank19_Selection.current;
+        const currentStyle = Ank19_State.getCellStyle(activeRow, activeCol);
+        if (currentStyle.isHeaderTint) {
+            Ank19_State.setCellStyle(activeRow, activeCol, { isHeaderTint: false, bold: false, bg: null });
+        } else {
+            Ank19_State.setCellStyle(activeRow, activeCol, { isHeaderTint: true, bold: true, bg: '#e2f0d9' });
+        }
+    }
+};
+
+const Ank19_Renderer = {
+    viewport: document.getElementById("Ank-Viewport"),
+    wrapper: document.getElementById("Ank-Viewport-Wrapper"),
+    isScheduled: false,
+
+    requestRender() {
+        if (this.isScheduled) return;
+        this.isScheduled = true;
+        requestAnimationFrame(() => {
+            this.isScheduled = false;
+            this.render();
+        });
+    },
+
+    render() {
+        const totalRows = Ank19_State.meta.rows;
+        const totalCols = Ank19_State.meta.cols;
+        
+        if (totalRows === 0 || totalCols === 0) {
+            this.viewport.innerHTML = '<div style="padding:20px; color:#64748b;">No sheet active. Choose a document and upload.</div>';
+            this.viewport.style.gridTemplateColumns = "1fr";
+            return;
+        }
+
+        // Configure columns layout template dimensions dynamically
+        this.viewport.style.gridTemplateColumns = `repeat(${totalCols}, minmax(140px, 1fr))`;
+        
+        // Calculate dynamic viewport ranges for chunk rendering requests
+        const scrollTop = this.wrapper.scrollTop;
+        const currentVisibleEstimatedRow = Math.floor(scrollTop / 36);
+        
+        if (CURRENT_WB_ID && !Ank19_DataManager.isChunkLoaded(currentVisibleEstimatedRow)) {
+            debouncedRequestChunk(currentVisibleEstimatedRow);
+        }
+        if (CURRENT_WB_ID && !Ank19_DataManager.isChunkLoaded(currentVisibleEstimatedRow + 15)) {
+            debouncedRequestChunk(currentVisibleEstimatedRow + 15);
+        }
+
+        // Clear display pool fragment context nodes before processing maps
+        this.viewport.innerHTML = "";
+        
+        const documentFragment = document.createDocumentFragment();
+        
+        // Render rows and columns sequentially into the CSS Grid container layout
+        for (let r = 0; r < totalRows; r++) {
+            for (let c = 0; c < totalCols; c++) {
+                const cellEl = document.createElement("div");
+                const cellData = Ank19_State.getCell(r, c);
+                const cellStyle = Ank19_State.getCellStyle(r, c);
+                
+                cellEl.textContent = cellData.v;
+                
+                // Assign visual class definitions based on role type
+                if (r === 0) {
+                    cellEl.className = "cell table-header";
+                } else {
+                    cellEl.className = "cell";
+                }
+                
+                // Inject style properties if active state modifications exist
+                if (cellStyle.bold) cellEl.classList.add("style-bold");
+                if (cellStyle.isHeaderTint) cellEl.classList.add("style-header-tint");
+                
+                if (Ank19_Selection.current.activeRow === r && Ank19_Selection.current.activeCol === c) {
+                    cellEl.classList.add("selected");
+                }
+                
+                cellEl.dataset.row = r;
+                cellEl.dataset.col = c;
+                
+                // Attach user iteration handling events directly
+                cellEl.addEventListener("click", (e) => {
+                    Ank19_Selection.setFocus(r, c);
+                });
+                
+                cellEl.addEventListener("dblclick", (e) => {
+                    Ank19_Editor.open(cellEl, r, c);
+                });
+
+                documentFragment.appendChild(cellEl);
+            }
+        }
+        
+        this.viewport.appendChild(documentFragment);
+        
+        // Sync record metrics labels text blocks
+        document.getElementById("paginationInfo").innerHTML = 
+            `Displaying structural records: <strong>${totalRows}</strong> Rows × <strong>${totalCols}</strong> Columns | Header Row Offset: <strong>${rowOffsetServer}</strong>`;
+    },
+
+    updateSingleCell(row, col) {
+        this.requestRender();
+    }
+};
+
+const Ank19_Selection = {
+    current: { activeRow: 0, activeCol: 0 },
+    reset() { this.current = { activeRow: 0, activeCol: 0 }; },
+    setFocus(r, c) {
+        this.current.activeRow = r;
+        this.current.activeCol = c;
+        Ank19_Renderer.requestRender();
+    }
+};
+
+const Ank19_Editor = {
+    input: document.getElementById("Ank19-CellEditor"),
+    activeRow: null,
+    activeCol: null,
+
+    open(targetEl, r, c) {
+        this.activeRow = r;
+        this.activeCol = c;
+        
+        const rect = targetEl.getBoundingClientRect();
+        const wrapperRect = document.getElementById("Ank-Viewport-Wrapper").getBoundingClientRect();
+        
+        this.input.style.left = `${targetEl.offsetLeft}px`;
+        this.input.style.top = `${targetEl.offsetTop}px`;
+        this.input.style.width = `${targetEl.offsetWidth}px`;
+        this.input.style.height = `${targetEl.offsetHeight}px`;
+        this.input.style.display = "block";
+        
+        this.input.value = Ank19_State.getCell(r, c).v;
+        this.input.focus();
+        
+        // Single-execution hook layout setup
+        this.input.onblur = () => this.close();
+        this.input.onkeydown = (e) => {
+            if (e.key === "Enter") this.close();
+            if (e.key === "Escape") {
+                this.input.style.display = "none";
+                this.input.onblur = null;
+            }
+        };
+    },
+
+    close() {
+        if (this.activeRow !== null && this.activeCol !== null) {
+            Ank19_State.setCell(this.activeRow, this.activeCol, this.input.value);
+        }
+        this.input.style.display = "none";
+        this.activeRow = null;
+        this.activeCol = null;
+        this.input.onblur = null;
+    }
+};
+
+const Ank19_EventBus = {
+    events: {},
+    emit(e, d) { (this.events[e] || []).forEach(fn => fn(d)); },
+    on(e, fn) { (this.events[e] = this.events[e] || []).push(fn); }
+};
+
+Ank19_EventBus.on("dataChanged", info => {
+    Ank19_Renderer.updateSingleCell(info.r, info.c);
+});
+
+document.getElementById("Ank-Viewport-Wrapper").addEventListener("scroll", () => {
+    Ank19_Renderer.requestRender();
+});
+
+async function AD_Export() {
+    const exportData = [];
+    const totalRows = Ank19_State.meta.rows;
+    const totalCols = Ank19_State.meta.cols;
+    
+    for (let r = 0; r < totalRows; r++) {
+        const row = [];
+        for (let c = 0; c < totalCols; c++) {
+            row.push(Ank19_State.getCell(r, c).v);
+        }
+        exportData.push(row);
+    }
+
+    const response = await fetch('/api/export', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ data: exportData, styles: Ank19_State.styles })
+    });
+
+    const blob = await response.blob();
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = "workbook_export_pro.xlsx";
+    a.click();
+}
+
+async function AD_Export_PPT() {
+    const exportData = [];
+    const totalRows = Ank19_State.meta.rows;
+    const totalCols = Ank19_State.meta.cols;
+    
+    for (let r = 0; r < totalRows; r++) {
+        const row = [];
+        for (let c = 0; c < totalCols; c++) {
+            row.push(Ank19_State.getCell(r, c).v);
+        }
+        exportData.push(row);
+    }
+
+    const response = await fetch('/api/export-ppt', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ data: exportData, styles: Ank19_State.styles })
+    });
+    const result = await response.json();
+    alert("PPT Model Strategy Payload Status: " + result.detail);
+}
+
+// Global initialization sequence check
+Ank19_Renderer.requestRender();
+</script>
+</body>
+</html>

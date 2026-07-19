@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Excel Designer Pro - Premium Engine</title>
+<style>
+    :root {
+    --bg-app: #f8fafc;
+    --surface: #ffffff;
+    --primary: #107c41;
+    --primary-hover: #0d6334;
+    --panel-border: #e2e8f0;
+    --text-main: #0f172a;
+    --text-muted: #64748b;
+    --cell-border: #cbd5e1;
+    --header-bg: #74cbc3;
+    --selected-bg: #e2f0d9;
+    --row-even: #f8fafc;
+    --row-odd: #ffffff;
+    --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+/* 🟢 EMERALD CLASSIC THEME */
+body.theme-emerald {
+    --bg-app: #edf8f3;
+    --surface: #ffffff;
+    --header-bg: #1f9d6b;
+    --row-even: #f1fcf6;
+    --row-odd: #ffffff;
+    --primary: #1f9d6b;
+    --primary-hover: #14744d;
+    --text-main: #163127;
+    --panel-border: #b7dcca;
+    --cell-border: #d6ebe0;
+    --selected-bg: #c8f2dc;
+}
+
+/* 🌾 MINIMAL PROGRESS THEME */
+body.theme-progress { 
+    --bg-app: #fffbeb;
+    --surface: #ffffff;
+    --primary: #d97706; 
+    --primary-hover: #b45309; 
+    --header-bg: #f1f5f9; 
+    --panel-border: #94a3b8; 
+    --cell-border: #e2e8f0; 
+    --selected-bg: #fef3c7; 
+    --row-even: #fff7ed;
+    --row-odd: #ffffff;
+}
+body.theme-progress .cell { border-right: none !important; border-bottom: 1px solid var(--cell-border); }
+
+/* 🌲 DEEP TEAL DASHBOARD THEME */
+body.theme-teal-dashboard { 
+    --bg-app: #eefcf9;
+    --surface: #ffffff;
+    --primary: #005f56; 
+    --primary-hover: #004d46; 
+    --header-bg: #005f56; 
+    --panel-border: #64748b; 
+    --cell-border: #e2e8f0; 
+    --selected-bg: #ccfbf1; 
+    --row-even: #dff7f3;
+    --row-odd: #ffffff;
+}
+body.theme-teal-dashboard .cell { border-right: 1px solid var(--cell-border); border-bottom: 1px solid var(--cell-border); }
+
+/* 📊 FINANCIAL PERFORMANCE THEME */
+body.theme-financial { 
+    --bg-app: #f4f8fb;
+    --surface: #ffffff;
+    --primary: #0f4c5c; 
+    --primary-hover: #0b323c; 
+    --header-bg: #104f60; 
+    --panel-border: #cbd5e1; 
+    --cell-border: transparent; 
+    --selected-bg: #dbeafe; 
+    --row-even: #eef6fb;
+    --row-odd: #ffffff;
+}
+body.theme-financial .cell { border-right: none !important; border-bottom: none !important; }
+
+/* BRAND CLASSIC / OCEAN / LUXURY RETENTION */
+body.theme-classic { --bg-app: #f8fafc; --surface: #ffffff; --primary: #1e293b; --primary-hover: #0f172a; --header-bg: #e2e8f0; --selected-bg: #e2e8f0; --row-even: #f8fafc; --row-odd: #ffffff; }
+body.theme-ocean { --bg-app: #f0f9ff; --surface: #ffffff; --primary: #0284c7; --primary-hover: #0369a1; --header-bg: #e0f2fe; --selected-bg: #bae6fd; --row-even: #f0f9ff; --row-odd: #ffffff; }
+body.theme-luxury { --bg-app: #faf5ff; --surface: #ffffff; --primary: #701a75; --primary-hover: #4a044e; --header-bg: #fae8ff; --selected-bg: #f5d0fe; --row-even: #faf5ff; --row-odd: #ffffff; }
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+    font-family: var(--font-family); font-size: 13px; color: var(--text-main);
+    background-color: var(--bg-app); height: 100vh; display: flex; flex-direction: column; overflow: hidden;
+    -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
+}
+
+.premium-container { width: 100vw; height: 100vh; display: flex; flex-direction: column; background-color: var(--bg-app); }
+
+/* Unified Layout Element Wireframes referencing variables instead of fixed values */
+.grid-viewport-wrapper { flex: 1; width: 100%; overflow: auto; position: relative; background-color: var(--bg-app); }
+.canvas-grid-engine { position: relative; width: 100%; height: 100%; background: var(--surface); }
+</style>
+</head>
+<body class="theme-emerald">
+    <div class="ankur">
+<h2>Excel Engine Designer</h2>
+<p>Created and developed by Ankur Dowarah</p>
+<p>Current Version 1.50</p>
+</div>
+<div class="premium-container">
+    <div class="executive-toolbar">
+        <div class="toolbar-group">
+            <div class="file-input-container">
+                <div class="btn-file-dummy">Drop your file here</div>
+                <input type="file" id="excelFile" accept=".csv,.xlsx" onchange="this.previousElementSibling.textContent = this.files[0]?.name || 'Choose Document'" />
+            </div>
+            <button class="btn-primary" onclick="handleUpload()">Upload</button>
+            <select class="theme-selector" id="themeSelect" onchange="applyGlobalTheme(this.value)">
+                <option value="emerald">🟢 Emerald Classic</option>
+                <option value="progress">🌾 Minimal Progress</option>
+                <option value="teal-dashboard">🌲 Deep Teal Dashboard</option>
+                <option value="financial">📊 Financial Performance</option>
+            </select>
+        </div>
+        
+        <div class="toolbar-group">
+            <button id="editModeBtn" class="btn-edit-mode" onclick="toggleEditMode()">🔒 Read Only</button>
+            <button id="addRowBtn" class="btn-action" onclick="Ank19_Mutator.insertRow()" disabled>➕ Add Row</button>
+            <button id="addColBtn" class="btn-action" onclick="Ank19_Mutator.insertColumn()" disabled>➕ Add Column</button>
+            <button id="delRowBtn" class="btn-danger" onclick="Ank19_Mutator.deleteRow()" disabled>❌ Delete Row</button>
+            <button id="delColBtn" class="btn-danger" onclick="Ank19_Mutator.deleteColumn()" disabled>❌ Delete Column</button>
+            <input type="color" id="customColorPicker" value="#e2f0d9" style="width:32px; height:32px; border:1px solid var(--panel-border); border-radius:4px; cursor:pointer;" disabled>
+            <button id="tintBtn" class="btn-action" onclick="Ank19_Mutator.applyFormat()" disabled>🎨 Apply Custom Tint</button>
+            <button class="btn-action" onclick="performExport()">Export Excel</button>
+            <button class="btn-ppt" onclick="performPPTXExport()">📊 PPTX Slide</button>
+        </div>
+    </div>
+    
+    <div class="pipeline-status-strip">
+        <div id="paginationInfo">Columns Page: 0/0</div>
+        <div>
+            <button style="padding:2px 6px; font-size:10px;" onclick="Ank19_ColumnPager.prevPage()">◀</button>
+            <button style="padding:2px 6px; font-size:10px;" onclick="Ank19_ColumnPager.nextPage()">▶</button>
+        </div>
+    </div>
+
+    <!-- Interactive Grid Filter Panel Strip -->
+    <div class="filter-panel-strip">
+        <strong>⚡ Filter Data Grid:</strong>
+        <select id="filterColumnSelect" class="filter-input-select" onchange="Ank19_FilterEngine.handleColumnChange()">
+            <option value="-1">-- Choose Column --</option>
+        </select>
+        
+        <!-- Added Unique Value Sub-Filter Menu Selector -->
+        <select id="filterSubSelect" class="filter-input-select" onchange="Ank19_FilterEngine.applyFilter()">
+            <option value="-1">-- Choose Sub-Filter --</option>
+        </select>
+
+        <input type="text" id="filterSearchInput" class="filter-search-box" placeholder="Primary Sub-Filter query..." oninput="Ank19_FilterEngine.applyFilter()">
+        <button class="btn-action" style="padding: 4px 10px;" onclick="Ank19_FilterEngine.clearFilter()">Clear Filter</button>
+    </div>
+
+    <!-- Shortcut Navigation Bar Dashboard -->
+    <div class="shortcut-navbar">
+        <div><strong>Quick Actions:</strong></div>
+        <div><span class="shortcut-badge">Alt + C</span> Select Column</div>
+        <div><span class="shortcut-badge">Alt + R</span> Select Row</div>
+        <div><span class="shortcut-badge">Alt + A</span> Select All Cells</div>
+        <div><span class="shortcut-badge">Alt + D</span> Deselect All</div>
+        <div style="margin-left: auto;" id="selectionTrackerStatus">Active Target: None</div>
+    </div>
+    
+    <textarea id="Ank19-CellEditor" class="cell-input-editor"></textarea>
+
+    <div class="grid-viewport-wrapper" id="Ank-Viewport-Wrapper">
+        <div class="canvas-grid-engine" id="Ank-Canvas"></div>
+    </div>
+</div>
+
+<div id="ank19-alert-overlay" class="custom-alert-overlay">
+    <div class="custom-alert-box">
+        <div id="ank19-alert-message" class="custom-alert-msg">Notification Message</div>
+        <button class="btn-primary" style="padding: 6px 18px;" onclick="closeCustomAlert()">OK</button>
+    </div>
+</div>
+<script>
+let CURRENT_WB_ID = null;
+let HEADER_OFFSET = 0;
+let Ank19_Worker = null;
+let SELECTED_THEME = "emerald";
+let IS_EDIT_MODE = false;
+let EXCEL_MERGE_TITLE = ""; 
+let IS_TITLE_EDITING = false;
+
+const GLOB_CHUNK_CACHE = new Map();
+const SESSION_DELTAS = new Map();
+let SELECTED_CELLS_SET = new Set(); 
+
+function showCustomAlert(msg) {
+    document.getElementById("ank19-alert-message").textContent = msg;
+    document.getElementById("ank19-alert-overlay").style.display = "flex";
+}
+
+function closeCustomAlert() {
+    document.getElementById("ank19-alert-overlay").style.display = "none";
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+    document.getElementById("themeSelect").value = SELECTED_THEME;
+    setupKeyboardShortcuts();
+});
+
+function setupKeyboardShortcuts() {
+    window.addEventListener("keydown", (e) => {
+        if (e.altKey) {
+            const key = e.key.toLowerCase();
+            if (key === 'c') {
+                e.preventDefault();
+                Ank19_SelectionEngine.selectColumn();
+            } else if (key === 'r') {
+                e.preventDefault();
+                Ank19_SelectionEngine.selectRow();
+            } else if (key === 'a') {
+                e.preventDefault();
+                Ank19_SelectionEngine.selectAll();
+            } else if (key === 'd') {
+                e.preventDefault();
+                Ank19_SelectionEngine.deselectAll();
+            }
+        }
+    });
+}
+
+const Ank19_State = {
+    meta: { rows: 0, cols: 0, headers: [] },
+    activeRow: 1,
+    activeCol: 0,
+    styles: {},
+    
+    getCell(r, c) {
+        if (r === 0) return { v: this.meta.headers[c] || "" };
+        const deltaKey = `${r}-${c}`;
+        if (SESSION_DELTAS.has(deltaKey)) return { v: SESSION_DELTAS.get(deltaKey) };
+        return { v: "" };
+    },
+    
+    setCell(r, c, val) {
+        if (!CURRENT_WB_ID) return;
+        if (r === 0) {
+            this.meta.headers[c] = val;
+            this.syncWithBackend();
+            Ank19_Renderer.requestRender();
+            return;
+        }
+        SESSION_DELTAS.set(`${r}-${c}`, val);
+        this.syncWithBackend();
+        Ank19_Renderer.requestRender();
+    },
+
+    syncWithBackend() {
+        fetch(`http://127.0.0.1:8000/api/mutate/${CURRENT_WB_ID}`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                data: Object.fromEntries(SESSION_DELTAS),
+                headers_array: this.meta.headers,
+                styles: this.styles,
+                title: EXCEL_MERGE_TITLE
+            })
+        });
+    }
+};
+
+// Frontend Dynamic Filter and Sub-Filter Dropdown Engine
+const Ank19_FilterEngine = {
+    filteredRows: null, 
+
+    handleColumnChange() {
+        const colIdx = parseInt(document.getElementById("filterColumnSelect").value);
+        const subSelect = document.getElementById("filterSubSelect");
+        
+        subSelect.innerHTML = '<option value="-1">-- Choose Sub-Filter --</option>';
+        
+        if (colIdx !== -1) {
+            const uniqueValues = new Set();
+            for (let r = 1; r <= Ank19_State.meta.rows; r++) {
+                const val = String(Ank19_State.getCell(r, colIdx).v).trim();
+                if (val) uniqueValues.add(val);
+            }
+            
+            Array.from(uniqueValues).sort().forEach(val => {
+                const opt = document.createElement("option");
+                opt.value = val;
+                opt.textContent = val;
+                subSelect.appendChild(opt);
+            });
+        }
+        this.applyFilter();
+    },
+
+    applyFilter() {
+        const colIdx = parseInt(document.getElementById("filterColumnSelect").value);
+        const subFilterVal = document.getElementById("filterSubSelect").value;
+        const searchVal = document.getElementById("filterSearchInput").value.toLowerCase().trim();
+        
+        if (colIdx === -1 && searchVal === "" && subFilterVal === "-1") {
+            this.filteredRows = null;
+            Ank19_Renderer.requestRender();
+            return;
+        }
+
+        this.filteredRows = [];
+        for (let r = 1; r <= Ank19_State.meta.rows; r++) {
+            let matches = true;
+            
+            if (colIdx !== -1) {
+                const cellVal = String(Ank19_State.getCell(r, colIdx).v);
+                
+                // Match dropdown choice if active
+                if (subFilterVal !== "-1" && cellVal !== subFilterVal) {
+                    matches = false;
+                }
+                // Match search keyword input if active
+                if (searchVal !== "" && !cellVal.toLowerCase().includes(searchVal)) {
+                    matches = false;
+                }
+            } else if (searchVal !== "") {
+                // If no specific column chosen, look through all columns for wildcard match
+                let rowText = "";
+                for (let c = 0; c < Ank19_State.meta.headers.length; c++) {
+                    rowText += String(Ank19_State.getCell(r, c).v).toLowerCase() + " ";
+                }
+                if (!rowText.includes(searchVal)) matches = false;
+            }
+
+            if (matches) {
+                this.filteredRows.push(r);
+            }
+        }
+        Ank19_Renderer.requestRender();
+    },
+
+    clearFilter() {
+        document.getElementById("filterColumnSelect").value = "-1";
+        document.getElementById("filterSubSelect").value = "-1";
+        document.getElementById("filterSubSelect").innerHTML = '<option value="-1">-- Choose Sub-Filter --</option>';
+        document.getElementById("filterSearchInput").value = "";
+        this.filteredRows = null;
+        Ank19_Renderer.requestRender();
+    },
+
+    populateColumns() {
+        const select = document.getElementById("filterColumnSelect");
+        select.innerHTML = '<option value="-1">-- Choose Column --</option>';
+        Ank19_State.meta.headers.forEach((h, idx) => {
+            const opt = document.createElement("option");
+            opt.value = idx;
+            opt.textContent = h || `Column ${idx + 1}`;
+            select.appendChild(opt);
+        });
+    }
+};
+
+const Ank19_SelectionEngine = {
+    selectColumn() {
+        if (!CURRENT_WB_ID) return;
+        SELECTED_CELLS_SET.clear();
+        const targetCol = Ank19_State.activeCol;
+        for (let r = 1; r <= Ank19_State.meta.rows; r++) {
+            SELECTED_CELLS_SET.add(`${r}-${targetCol}`);
+        }
+        this.updateTrackerStatus(`Column ${targetCol + 1} Captured`);
+        Ank19_Renderer.requestRender();
+    },
+    selectRow() {
+        if (!CURRENT_WB_ID || Ank19_State.activeRow === 0) return;
+        SELECTED_CELLS_SET.clear();
+        const targetRow = Ank19_State.activeRow;
+        for (let c = 0; c < Ank19_State.meta.headers.length; c++) {
+            SELECTED_CELLS_SET.add(`${targetRow}-${c}`);
+        }
+        this.updateTrackerStatus(`Row ${targetRow} Captured`);
+        Ank19_Renderer.requestRender();
+    },
+    selectAll() {
+        if (!CURRENT_WB_ID) return;
+        SELECTED_CELLS_SET.clear();
+        for (let r = 1; r <= Ank19_State.meta.rows; r++) {
+            for (let c = 0; c < Ank19_State.meta.headers.length; c++) {
+                SELECTED_CELLS_SET.add(`${r}-${c}`);
+            }
+        }
+        this.updateTrackerStatus("Full Grid Workspace Selected");
+        Ank19_Renderer.requestRender();
+    },
+    deselectAll() {
+        SELECTED_CELLS_SET.clear();
+        this.updateTrackerStatus("Workspace Purged");
+        Ank19_Renderer.requestRender();
+    },
+    updateTrackerStatus(msg) {
+        document.getElementById("selectionTrackerStatus").textContent = `Active Target: ${msg}`;
+    }
+};
+
+const Ank19_ColumnPager = {
+    currentPage: 0,
+    visibleCols: 0,
+    colWidth: 140,
+    calculateVisibleColumns() {
+        const wrapperWidth = document.getElementById("Ank-Viewport-Wrapper").clientWidth || 980;
+        this.visibleCols = Math.max(1, Math.floor(wrapperWidth / this.colWidth));
+    },
+    getRange() {
+        this.calculateVisibleColumns();
+        return { start: 0, end: Ank19_State.meta.headers.length - 1 };
+    },
+    nextPage() {
+        if (this.currentPage < (Math.ceil(Ank19_State.meta.headers.length / this.visibleCols) - 1)) {
+            this.currentPage++;
+            document.getElementById("Ank-Viewport-Wrapper").scrollLeft = this.currentPage * this.visibleCols * this.colWidth;
+            Ank19_Renderer.requestRender();
+        }
+    },
+    prevPage() {
+        if (this.currentPage > 0) {
+            this.currentPage--;
+            document.getElementById("Ank-Viewport-Wrapper").scrollLeft = this.currentPage * this.visibleCols * this.colWidth;
+            Ank19_Renderer.requestRender();
+        }
+    }
+};
+
+const Ank19_Renderer = {
+    canvas: document.getElementById("Ank-Canvas"),
+    wrapper: document.getElementById("Ank-Viewport-Wrapper"),
+    rowHeight: 48, 
+    titleHeight: 44, 
+    isScheduled: false,
+
+    requestRender() {
+        if (this.isScheduled) return;
+        this.isScheduled = true;
+        requestAnimationFrame(() => { this.isScheduled = false; this.render(); });
+    },
+
+    render() {
+        this.canvas.innerHTML = ""; 
+        const totalRows = Ank19_State.meta.rows + 1; 
+        if (totalRows <= 1) {
+            this.canvas.innerHTML = '<div style="padding:40px; text-align:center; color:#64748b; font-size:15px;">Viewport Empty. Upload Sheet to Begin.</div>';
+            return;
+        }
+
+        const totalCols = Ank19_State.meta.headers.length;
+        const scrollTop = this.wrapper.scrollTop;
+
+        const titleContainer = document.createElement("div");
+        titleContainer.className = "merge-title-container";
+        titleContainer.style.top = `${scrollTop}px`;
+        titleContainer.style.width = `${totalCols * Ank19_ColumnPager.colWidth}px`;
+        
+        if (!IS_TITLE_EDITING) {
+            titleContainer.innerHTML = `<div class="merge-title-banner ${!EXCEL_MERGE_TITLE ? 'placeholder' : ''}">${EXCEL_MERGE_TITLE || '✨ Click to Add Title...'}</div>`;
+            titleContainer.firstChild.onclick = () => {
+                if (!IS_EDIT_MODE) return showCustomAlert("Please turn on Live Editing mode to modify titles.");
+                IS_TITLE_EDITING = true;
+                Ank19_Renderer.requestRender();
+            };
+        } else {
+            titleContainer.innerHTML = `<input type="text" class="merge-title-input" value="${EXCEL_MERGE_TITLE}" />`;
+            const input = titleContainer.firstChild;
+            input.focus();
+            input.onblur = () => {
+                EXCEL_MERGE_TITLE = input.value.trim();
+                IS_TITLE_EDITING = false;
+                Ank19_State.syncWithBackend();
+                Ank19_Renderer.requestRender();
+            };
+        }
+        this.canvas.appendChild(titleContainer);
+
+        let visualRowCounter = 0;
+        for (let r = 0; r < totalRows; r++) {
+            
+            const isHeader = (r === 0);
+            
+            if (!isHeader && Ank19_FilterEngine.filteredRows !== null && !Ank19_FilterEngine.filteredRows.includes(r)) {
+                continue; 
+            }
+
+            const posY = (visualRowCounter * this.rowHeight) + this.titleHeight;
+            visualRowCounter++;
+
+            for (let c = 0; c < totalCols; c++) {
+                const cellEl = document.createElement("div");
+                const cellData = Ank19_State.getCell(r, c);
+                const cellStyle = Ank19_State.styles[`${r}-${c}`] || {};
+
+                cellEl.textContent = cellData.v || "";
+                cellEl.className = isHeader ? "cell table-header" : "cell";
+                
+                if (!isHeader) {
+                    if (cellStyle.tint) {
+                        cellEl.style.backgroundColor = cellStyle.tint;
+                    } else {
+                        cellEl.style.backgroundColor = (r % 2 === 0) ? "#f8fafc" : "#ffffff";
+                    }
+                }
+
+                if (cellStyle.bold) cellEl.style.fontWeight = "bold";
+                
+                if (Ank19_State.activeRow === r && Ank19_State.activeCol === c) {
+                    cellEl.classList.add("selected");
+                } else if (SELECTED_CELLS_SET.has(`${r}-${c}`)) {
+                    cellEl.classList.add("multi-selected");
+                }
+
+                cellEl.style.top = isHeader ? `${scrollTop + this.titleHeight}px` : `${posY}px`;
+                cellEl.style.left = `${c * Ank19_ColumnPager.colWidth}px`;
+                cellEl.style.width = `${Ank19_ColumnPager.colWidth}px`;
+                cellEl.style.height = `${this.rowHeight}px`;
+                cellEl.style.zIndex = isHeader ? "5" : "1";
+
+                const targetRow = r; const targetCol = c;
+                cellEl.onclick = () => {
+                    Ank19_State.activeRow = targetRow; Ank19_State.activeCol = targetCol;
+                    Ank19_Renderer.requestRender();
+                };
+                
+                cellEl.ondblclick = () => { 
+                    if (IS_EDIT_MODE) Ank19_Editor.open(cellEl, targetRow, targetCol);
+                    else showCustomAlert("First Disable Read Mode");
+                };
+
+                this.canvas.appendChild(cellEl);
+            }
+            
+        }
+        
+        this.canvas.style.height = `${(visualRowCounter * this.rowHeight) + this.titleHeight}px`;
+        this.canvas.style.width = `${totalCols * Ank19_ColumnPager.colWidth}px`;
+        
+        Ank19_ColumnPager.calculateVisibleColumns();
+        const activePage = Math.floor(this.wrapper.scrollLeft / (Ank19_ColumnPager.visibleCols * Ank19_ColumnPager.colWidth)) + 1;
+        const totalPages = Math.ceil(totalCols / Ank19_ColumnPager.visibleCols) || 1;
+        document.getElementById("paginationInfo").innerHTML = `Rows Visited: <strong>${visualRowCounter - 1}</strong> | Columns Page: <strong>${activePage}/${totalPages}</strong>`;
+    }
+};
+
+const Ank19_Mutator = {
+    insertRow() {
+        if (!CURRENT_WB_ID) return;
+        const insertAt = Ank19_State.activeRow; 
+        const updatedDeltas = new Map();
+        const updatedStyles = {};
+
+        SESSION_DELTAS.forEach((val, key) => {
+            const [r, c] = key.split("-").map(Number);
+            if (r >= insertAt) updatedDeltas.set(`${r + 1}-${c}`, val);
+            else updatedDeltas.set(key, val);
+        });
+
+        Object.keys(Ank19_State.styles).forEach(key => {
+            const [r, c] = key.split("-").map(Number);
+            if (r >= insertAt) updatedStyles[`${r + 1}-${c}`] = Ank19_State.styles[key];
+            else updatedStyles[key] = Ank19_State.styles[key];
+        });
+
+        SESSION_DELTAS.clear();
+        updatedDeltas.forEach((v, k) => SESSION_DELTAS.set(k, v));
+        Ank19_State.styles = updatedStyles;
+
+        Ank19_State.meta.rows++;
+        Ank19_State.syncWithBackend();
+        Ank19_Renderer.requestRender();
+    },
+
+    insertColumn() {
+        if (!CURRENT_WB_ID) return;
+        const insertAt = Ank19_State.activeCol;
+        
+        Ank19_State.meta.headers.splice(insertAt, 0, `New Col ${Ank19_State.meta.headers.length + 1}`);
+        const updatedDeltas = new Map();
+        const updatedStyles = {};
+
+        SESSION_DELTAS.forEach((val, key) => {
+            const [r, c] = key.split("-").map(Number);
+            if (c >= insertAt) updatedDeltas.set(`${r}-${c + 1}`, val);
+            else updatedDeltas.set(key, val);
+        });
+
+        Object.keys(Ank19_State.styles).forEach(key => {
+            const [r, c] = key.split("-").map(Number);
+            if (c >= insertAt) updatedStyles[`${r}-${c + 1}`] = Ank19_State.styles[key];
+            else updatedStyles[key] = Ank19_State.styles[key];
+        });
+
+        SESSION_DELTAS.clear();
+        updatedDeltas.forEach((v, k) => SESSION_DELTAS.set(k, v));
+        Ank19_State.styles = updatedStyles;
+
+        Ank19_State.syncWithBackend();
+        Ank19_FilterEngine.populateColumns();
+        Ank19_Renderer.requestRender();
+    },
+
+    deleteRow() {
+        if (!CURRENT_WB_ID || Ank19_State.meta.rows <= 0) return;
+        const removeAt = Ank19_State.activeRow;
+        const updatedDeltas = new Map();
+        
+        SESSION_DELTAS.forEach((val, key) => {
+            const [r, c] = key.split("-").map(Number);
+            if (r > removeAt) updatedDeltas.set(`${r - 1}-${c}`, val);
+            else if (r < removeAt) updatedDeltas.set(key, val);
+        });
+        SESSION_DELTAS.clear();
+        updatedDeltas.forEach((v, k) => SESSION_DELTAS.set(k, v));
+        
+        Ank19_State.meta.rows--;
+        Ank19_State.syncWithBackend();
+        Ank19_Renderer.requestRender();
+    },
+
+    deleteColumn() {
+        if (!CURRENT_WB_ID || Ank19_State.meta.headers.length <= 1) return;
+        const removeAt = Ank19_State.activeCol;
+        
+        Ank19_State.meta.headers.splice(removeAt, 1);
+        const updatedDeltas = new Map();
+        
+        SESSION_DELTAS.forEach((val, key) => {
+            const [r, c] = key.split("-").map(Number);
+            if (c > removeAt) updatedDeltas.set(`${r}-${c - 1}`, val);
+            else if (c < removeAt) updatedDeltas.set(key, val);
+        });
+        SESSION_DELTAS.clear();
+        updatedDeltas.forEach((v, k) => SESSION_DELTAS.set(k, v));
+
+        Ank19_State.syncWithBackend();
+        Ank19_FilterEngine.populateColumns();
+        Ank19_Renderer.requestRender();
+    },
+
+    applyFormat() {
+        const chosenColor = document.getElementById("customColorPicker").value;
+        let targets = [];
+        if (SELECTED_CELLS_SET.size > 0) {
+            targets = Array.from(SELECTED_CELLS_SET);
+        } else {
+            targets.push(`${Ank19_State.activeRow}-${Ank19_State.activeCol}`);
+        }
+
+        targets.forEach(key => {
+            const [r, c] = key.split("-").map(Number);
+            if (r === 0) return;
+
+            if (!Ank19_State.styles[key]) Ank19_State.styles[key] = {};
+            Ank19_State.styles[key].bold = true;
+            Ank19_State.styles[key].tint = chosenColor;
+        });
+
+        Ank19_State.syncWithBackend();
+        Ank19_Renderer.requestRender();
+    }
+};
+
+const Ank19_Editor = {
+    input: document.getElementById("Ank19-CellEditor"),
+    r: null, c: null,
+    open(target, r, c) {
+        this.r = r; this.c = c;
+        const box = target.getBoundingClientRect();
+        const wrapperBox = document.getElementById("Ank-Viewport-Wrapper").getBoundingClientRect();
+        
+        this.input.style.left = `${box.left - wrapperBox.left + document.getElementById("Ank-Viewport-Wrapper").scrollLeft}px`;
+        this.input.style.top = `${box.top - wrapperBox.top + document.getElementById("Ank-Viewport-Wrapper").scrollTop}px`;
+        this.input.style.width = `${box.width}px`;
+        this.input.style.height = `${box.height}px`;
+        this.input.style.display = "block";
+        this.input.value = Ank19_State.getCell(r, c).v;
+        this.input.focus();
+        
+        this.input.onblur = () => this.close();
+        this.input.onkeydown = (e) => { if(e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); this.close(); } };
+    },
+    close() {
+        if(this.r !== null) {
+            Ank19_State.setCell(this.r, this.c, this.input.value);
+            this.r = null; this.c = null;
+            this.input.style.display = "none";
+        }
+    }
+};
+
+function toggleEditMode() {
+    if (!CURRENT_WB_ID) return showCustomAlert("Upload an excel first");
+    IS_EDIT_MODE = !IS_EDIT_MODE;
+    const btn = document.getElementById("editModeBtn");
+    btn.textContent = IS_EDIT_MODE ? "🔓 Live Editing" : "🔒 Read Only";
+    btn.classList.toggle("active", IS_EDIT_MODE);
+    
+    ["addRowBtn", "addColBtn", "delRowBtn", "delColBtn", "tintBtn", "customColorPicker"].forEach(id => {
+        document.getElementById(id).disabled = !IS_EDIT_MODE;
+    });
+}
+
+function applyGlobalTheme(themeName) {
+    document.body.className = `theme-${themeName}`;
+    SELECTED_THEME = themeName;
+    Ank19_Renderer.requestRender();
+}
+
+async function handleUpload() {
+    const fileInput = document.getElementById('excelFile');
+    if (!fileInput.files[0]) return showCustomAlert("Select an excel file first");
+    
+    const formData = new FormData();
+    formData.append("file", fileInput.files[0]);
+    
+    try {
+        const res = await fetch("http://127.0.0.1:8000/api/upload", { method: "POST", body: formData });
+        if (!res.ok) throw new Error("Upload validation failed.");
+        const result = await res.json();
+        
+        CURRENT_WB_ID = result.workbook_id;
+        HEADER_OFFSET = result.meta.offset;
+        
+        const dataRes = await fetch(`http://127.0.0.1:8000/api/workbook/${CURRENT_WB_ID}/rows?start=0&count=${result.meta.rows}&offset=${HEADER_OFFSET}`);
+        const dataJson = await dataRes.json();
+        
+        Ank19_State.meta.rows = result.meta.rows;
+        Ank19_State.meta.headers = result.meta.headers;
+        
+        SESSION_DELTAS.clear();
+        dataJson.rows.forEach((row, rIdx) => {
+            row.forEach((val, cIdx) => {
+                SESSION_DELTAS.set(`${rIdx + 1}-${cIdx}`, val);
+            });
+        });
+        
+        Ank19_FilterEngine.populateColumns();
+        Ank19_Renderer.requestRender();
+    } catch(err) {
+        showCustomAlert("Upload failure: " + err.message);
+    }
+}
+
+async function performExport() {
+    if (!CURRENT_WB_ID) return showCustomAlert("No active workbook instance discovered.");
+    try {
+        const res = await fetch(`http://127.0.0.1:8000/api/export/${CURRENT_WB_ID}`, { 
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ theme: SELECTED_THEME, title: EXCEL_MERGE_TITLE, total_rows: Ank19_State.meta.rows })
+        });
+        const blob = await res.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `Exported_Spreadsheet_${Date.now()}.xlsx`;
+        a.click();
+    } catch(e) {
+        showCustomAlert("Export aborted: " + e.message);
+    }
+}
+
+async function performPPTXExport() {
+    if (!CURRENT_WB_ID) return showCustomAlert("No active workbook instance discovered.");
+    try {
+        const res = await fetch(`http://127.0.0.1:8000/api/export_pptx/${CURRENT_WB_ID}`, { 
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ theme: SELECTED_THEME, title: EXCEL_MERGE_TITLE, total_rows: Ank19_State.meta.rows })
+        });
+        const blob = await res.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `Exported_Presentation_${Date.now()}.pptx`;
+        a.click();
+    } catch(e) {
+        showCustomAlert("PPTX Export aborted: " + e.message);
+    }
+}
+
+document.getElementById("Ank-Viewport-Wrapper").addEventListener("scroll", () => Ank19_Renderer.requestRender());
+window.addEventListener("resize", () => Ank19_Renderer.requestRender());
+</script>
+</body>
+</html>
