@@ -385,7 +385,7 @@ const Ank19_State = {
     },
 
     syncWithBackend() {
-        fetch(`${API_BASE}/mutate/${CURRENT_WB_ID}`, {
+        fetch(`${API_BASE}/api/mutate/${CURRENT_WB_ID}`, {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({
@@ -889,14 +889,14 @@ async function handleUpload() {
     formData.append("file", fileInput.files[0]);
     
     try {
-        const res = await fetch(`${API_BASE}/upload`, { method: "POST", body: formData });
+        const res = await fetch(`${API_BASE}/api/upload`, { method: "POST", body: formData });
         if (!res.ok) throw new Error("Upload validation failed.");
         const result = await res.json();
         
         CURRENT_WB_ID = result.workbook_id;
         HEADER_OFFSET = result.meta.offset;
         
-        const dataRes = await fetch(`${API_BASE}/workbook/${CURRENT_WB_ID}/rows?start=0&count=${result.meta.rows}&offset=${HEADER_OFFSET}`);
+        const dataRes = await fetch(`${API_BASE}/api/workbook/${CURRENT_WB_ID}/rows?start=0&count=${result.meta.rows}&offset=${HEADER_OFFSET}`);
         const dataJson = await dataRes.json();
         
         Ank19_State.meta.rows = result.meta.rows;
@@ -918,7 +918,7 @@ async function handleUpload() {
 
 async function performCleanup(workbookId) {
     try {
-        await fetch(`${API_BASE}/cleanup/${workbookId}`, { method: 'DELETE' });
+        await fetch(`${API_BASE}/api/cleanup/${workbookId}`, { method: 'DELETE' });
     } catch(e) {
         console.error("Auto-delete task encountered problems:", e);
     }
@@ -928,7 +928,7 @@ async function performExport() {
     if (!CURRENT_WB_ID) return showCustomAlert("No active workbook instance discovered.");
     const targetWb = CURRENT_WB_ID;
     try {
-        const res = await fetch(`${API_BASE}/export/${targetWb}`, { 
+        const res = await fetch(`${API_BASE}/api/export/${targetWb}`, { 
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ theme: SELECTED_THEME, title: EXCEL_MERGE_TITLE, total_rows: Ank19_State.meta.rows })
@@ -950,7 +950,7 @@ async function performPPTXExport() {
     if (!CURRENT_WB_ID) return showCustomAlert("No active workbook instance discovered.");
     const targetWb = CURRENT_WB_ID;
     try {
-        const res = await fetch(`${API_BASE}/export_pptx/${targetWb}`, { 
+        const res = await fetch(`${API_BASE}/api/export_pptx/${targetWb}`, { 
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ theme: SELECTED_THEME, title: EXCEL_MERGE_TITLE, total_rows: Ank19_State.meta.rows })
