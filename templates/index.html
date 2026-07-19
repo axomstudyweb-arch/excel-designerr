@@ -28,7 +28,7 @@
             --bg-app: #edf8f3;
             --surface: #ffffff;
             --header-bg: #1f9d6b;
-            --row-even: rgb(166 255 206);
+            --row-even: rgb(166, 255, 206);
             --row-odd: #ffffff;
             --primary: #1f9d6b;
             --primary-hover: #14744d;
@@ -43,11 +43,12 @@
             --bg-app: #fffbeb;
             --surface: #ffffff;
             --primary: #d97706; 
-            --primary-hover: #b45309; --header-bg: #fbcaeb;
+            --primary-hover: #b45309; 
+            --header-bg: #fbcaeb;
             --panel-border: #f385ce; 
             --cell-border: #e2e8f0; 
             --selected-bg: #fef3c7; 
-            --row-even: #fed;
+            --row-even: #ffeedd;
             --row-odd: #ffffff;
         }
         body.theme-progress .cell { border-right: none !important; border-bottom: 1px solid var(--cell-border); }
@@ -82,13 +83,8 @@
         }
         body.theme-financial .cell { border-right: none !important; border-bottom: none !important; }
 
-        /* BRAND RETENTIONS */
-        body.theme-classic { --bg-app: #f8fafc; --surface: #ffffff; --primary: #1e293b; --primary-hover: #0f172a; --header-bg: #e2e8f0; --selected-bg: #e2e8f0; --row-even: #f8fafc; --row-odd: #ffffff; }
-        body.theme-ocean { --bg-app: #f0f9ff; --surface: #ffffff; --primary: #0284c7; --primary-hover: #0369a1; --header-bg: #e0f2fe; --selected-bg: #bae6fd; --row-even: #f0f9ff; --row-odd: #ffffff; }
-        body.theme-luxury { --bg-app: #faf5ff; --surface: #ffffff; --primary: #701a75; --primary-hover: #4a044e; --header-bg: #fae8ff; --selected-bg: #f5d0fe; --row-even: #faf5ff; --row-odd: #ffffff; }
-
         html, body {
-            overflow: hidden !important;
+            overflow-x: hidden !important;
             max-width: 100%;
             height: 100vh;
         }
@@ -206,7 +202,8 @@
 
         body.theme-teal-dashboard .cell.table-header,
         body.theme-financial .cell.table-header,
-        body.theme-emerald .cell.table-header { color: #ffffff !important; }
+        body.theme-emerald .cell.table-header,
+        body.theme-progress .cell.table-header { color: #ffffff !important; }
 
         .cell.selected { outline: 2px solid var(--primary) !important; z-index: 3; }
         .cell.multi-selected { outline: 2px dashed var(--primary) !important; background-color: var(--selected-bg) !important; z-index: 2; }
@@ -270,14 +267,12 @@
         </div>
     </div>
 
-    <!-- Interactive Grid Filter Panel Strip -->
-    <div class="filter-panel-strip">
+   <div class="filter-panel-strip">
         <strong>⚡ Filter Data Grid:</strong>
         <select id="filterColumnSelect" class="filter-input-select" onchange="Ank19_FilterEngine.handleColumnChange()">
             <option value="-1">-- Choose Column --</option>
         </select>
         
-        <!-- Added Unique Value Sub-Filter Menu Selector -->
         <select id="filterSubSelect" class="filter-input-select" onchange="Ank19_FilterEngine.applyFilter()">
             <option value="-1">-- Choose Sub-Filter --</option>
         </select>
@@ -286,7 +281,6 @@
         <button class="btn-action" style="padding: 4px 10px;" onclick="Ank19_FilterEngine.clearFilter()">Clear Filter</button>
     </div>
 
-    <!-- Shortcut Navigation Bar Dashboard -->
     <div class="shortcut-navbar">
         <div><strong>Quick Actions:</strong></div>
         <div><span class="shortcut-badge">Alt + C</span> Select Column</div>
@@ -321,7 +315,7 @@ let IS_TITLE_EDITING = false;
 const GLOB_CHUNK_CACHE = new Map();
 const SESSION_DELTAS = new Map();
 let SELECTED_CELLS_SET = new Set(); 
-const API_BASE = "https://your-backend.onrender.com";
+const API_BASE = "https://excel-designer-engine.onrender.com";
 
 function showCustomAlert(msg) {
     document.getElementById("ank19-alert-message").textContent = msg;
@@ -385,7 +379,7 @@ const Ank19_State = {
     },
 
     syncWithBackend() {
-        fetch(`${API_BASE}/api/mutate/${CURRENT_WB_ID}`, {
+        fetch(`${API_BASE}/api/api/mutate/${CURRENT_WB_ID}`, {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({
@@ -878,7 +872,9 @@ function toggleEditMode() {
 function applyGlobalTheme(themeName) {
     document.body.className = `theme-${themeName}`;
     SELECTED_THEME = themeName;
-    Ank19_Renderer.requestRender();
+    setTimeout(() => {
+        Ank19_Renderer.requestRender();
+    }, 50);
 }
 
 async function handleUpload() {
