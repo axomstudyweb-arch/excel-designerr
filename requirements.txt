@@ -6,3 +6,4 @@ python-pptx
 pytesseract
 opencv-python
 pillow
+python-multipart
