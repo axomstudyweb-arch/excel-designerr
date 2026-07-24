@@ -189,10 +189,17 @@ async def export_workbook(workbook_id: str, payload: ExportPayload):
     ws.title = "Designer Export"
 
     excel_theme_fills = {
-        "progress": {"header": "F8FAFC", "even": "FFFFFF", "odd": "FDFBF7"},
-        "teal-dashboard": {"header": "005F56", "even": "FFFFFF", "odd": "FAFAFA"},
-        "financial": {"header": "104F60", "even": "E8EEF3", "odd": "FFFFFF"},
-        "emerald": {"header": "107C41", "even": "FFFFFF", "odd": "F8FAFC"}
+        "progress": {"header": "fbcaeb", "even": "ffeedd", "odd": "ffffff"},
+        "teal-dashboard": {"header": "005f56", "even": "b1f5e9", "odd": "ffffff"},
+        "financial": {"header": "263a95", "even": "bfd2dd", "odd": "e9ecf7"},
+        "emerald": {"header": "1f9d6b", "even": "a6ffce", "odd": "FFFFFF"},
+        "midnight":{"header": "334155", "even": "1e293b", "odd": "0f172a"},
+        "crimson":{"header": "991b1b", "even": "ffe4ef", "odd": "FFFFFF"},
+        "oceanic":{"header": "0369a1", "even": "e0f2fe", "odd": "FFFFFF"},
+        "minimalist":{"header": "f3f7f7", "even": "f8fafc", "odd": "FFFFFF"},
+        "card":{"header": "8b3716", "even": "ffdede", "odd": "ffdec1"},
+        "highcontrast":{"header": "1e1b4b", "even": "111827", "odd": "0f172a"},
+        "glass":{"header": "4b82c1b5", "even": "rgb(79 66 211 / 18%)", "odd": "FFFFFF"}
     }
     t_set = excel_theme_fills.get(payload.theme, excel_theme_fills["emerald"])
 

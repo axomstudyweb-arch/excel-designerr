@@ -1,971 +1,1467 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Excel Designer Pro - Premium Engine</title>
-    <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        
-        :root {
-            --bg-app: #f8fafc;
-            --surface: #ffffff;
-            --primary: #107c41;
-            --primary-hover: #0d6334;
-            --panel-border: #e2e8f0;
-            --text-main: #0f172a;
-            --text-muted: #64748b;
-            --cell-border: #cbd5e1;
-            --header-bg: #74cbc3;
-            --selected-bg: #e2f0d9;
-            --row-even: #f8fafc;
-            --row-odd: #ffffff;
-            --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-        }
+<style>
+    /* Scoped Reset to Prevent Theme Pollution */
+    .hopyn-excel-wrapper,
+    .hopyn-excel-wrapper *,
+    .abhi-alert-overlay,
+    .abhi-alert-overlay * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
 
-        /* 🟢 EMERALD CLASSIC THEME */
-        body.theme-emerald {
-            --bg-app: #edf8f3;
-            --surface: #ffffff;
-            --header-bg: #1f9d6b;
-            --row-even: rgb(166, 255, 206);
-            --row-odd: #ffffff;
-            --primary: #1f9d6b;
-            --primary-hover: #14744d;
-            --text-main: #163127;
-            --panel-border: #b7dcca;
-            --cell-border: #d6ebe0;
-            --selected-bg: #c8f2dc;
-        }
+    /* Root Application Container */
+    .hopyn-excel-wrapper {
+        --axm-bg-app: #f8fafc;
+        --axm-surface: #ffffff;
+        --axm-primary: #107c41;
+        --axm-primary-hover: #0d6334;
+        --axm-panel-border: #e2e8f0;
+        --axm-text-main: #0f172a;
+        --axm-text-muted: #64748b;
+        --axm-cell-border: #cbd5e1;
+        --axm-header-bg: #74cbc3;
+        --axm-selected-bg: #e2f0d9;
+        --axm-row-even: #f8fafc;
+        --axm-row-odd: #ffffff;
+        --axm-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 
-        /* 🌾 MINIMAL PROGRESS THEME */
-        body.theme-progress { 
-            --bg-app: #fffbeb;
-            --surface: #ffffff;
-            --primary: #d97706; 
-            --primary-hover: #b45309; 
-            --header-bg: #fbcaeb;
-            --panel-border: #f385ce; 
-            --cell-border: #e2e8f0; 
-            --selected-bg: #fef3c7; 
-            --row-even: #ffeedd;
-            --row-odd: #ffffff;
-        }
-        body.theme-progress .cell { border-right: none !important; border-bottom: 1px solid var(--cell-border); }
+        width: 100%;
+        height: calc(100vh - 48px);
+        font-family: var(--axm-font-family);
+        background: var(--axm-bg-app);
+        color: var(--axm-text-main);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        position: relative;
+    }
+  .axm-cell:hover {
+  background-color: #f0f7ff !important;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
 
-        /* 🌲 DEEP TEAL DASHBOARD THEME */
-        body.theme-teal-dashboard { 
-            --bg-app: #eefcf9;
-            --surface: #ffffff;
-            --primary: #005f56; 
-            --primary-hover: #004d46; 
-            --header-bg: #005f56; 
-            --panel-border: #64748b; 
-            --cell-border: #e2e8f0; 
-            --selected-bg: #ccfbf1; 
-            --row-even: #b1f5e9;
-            --row-odd: #ffffff;
-        }
-        body.theme-teal-dashboard .cell { border-right: 1px solid var(--cell-border); border-bottom: 1px solid var(--cell-border); }
+    /* --- NAMESPACED THEME DEFINITIONS --- */
+    .axm-theme-emerald, .axm-theme-emerald.hopyn-excel-wrapper {
+        --axm-bg-app: #edf8f3; --axm-surface: #ffffff; --axm-header-bg: #1f9d6b;
+        --axm-row-even: #a6ffce; --axm-row-odd: #ffffff;
+        --axm-primary: #1f9d6b; --axm-primary-hover: #14744d; --axm-text-main: #163127;
+        --axm-panel-border: #b7dcca; --axm-cell-border: #d6ebe0; --axm-selected-bg: #c8f2dc;
+    }
 
-        /* 📊 FINANCIAL PERFORMANCE THEME */
-        body.theme-financial {
-            --bg-app: #f4f8fb;
-            --surface: #ffffff;
-            --primary: #0f4c5c;
-            --primary-hover: #0b323c;
-            --header-bg: #263a95;
-            --panel-border: #cbd5e1;
-            --cell-border: transparent;
-            --selected-bg: #dbeafe;
-            --row-even: #bfd2dd;
-            --row-odd: #e9ecf7;
-        }
-        body.theme-financial .cell { border-right: none !important; border-bottom: none !important; }
+    .axm-theme-progress, .axm-theme-progress.hopyn-excel-wrapper { 
+        --axm-bg-app: #fffbeb; --axm-surface: #ffffff; --axm-primary: #d97706; 
+        --axm-primary-hover: #b45309; --axm-header-bg: #fbcaeb; --axm-panel-border: #f385ce; 
+        --axm-cell-border: #e2e8f0; --axm-selected-bg: #fef3c7; --axm-row-even: #ffeedd; --axm-row-odd: #ffffff;
+    }
 
-        html, body {
-            overflow-x: hidden !important;
-            max-width: 100%;
-            height: 100vh;
-        }
+    .axm-theme-teal-dashboard, .axm-theme-teal-dashboard.hopyn-excel-wrapper { 
+        --axm-bg-app: #eefcf9; --axm-surface: #ffffff; --axm-primary: #005f56; 
+        --axm-primary-hover: #004d46; --axm-header-bg: #005f56; --axm-panel-border: #64748b; 
+        --axm-cell-border: #e2e8f0; --axm-selected-bg: #ccfbf1; --axm-row-even: #b1f5e9; --axm-row-odd: #ffffff;
+    }
 
-        body {
-            font-family: var(--font-family); font-size: 13px; color: var(--text-main);
-            background-color: var(--bg-app); display: flex; flex-direction: column;
-            -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
-        }
+    .axm-theme-financial, .axm-theme-financial.hopyn-excel-wrapper {
+        --axm-bg-app: #f4f8fb; --axm-surface: #ffffff; --axm-primary: #0f4c5c;
+        --axm-primary-hover: #0b323c; --axm-header-bg: #263a95; --axm-panel-border: #cbd5e1;
+        --axm-cell-border: transparent; --axm-selected-bg: #dbeafe; --axm-row-even: #bfd2dd; --axm-row-odd: #e9ecf7;
+    }
 
-        .ankur {
-            background: #22314b;
-            padding: 10px;
-        }
-        .ankur h2 {
-            text-align: center;
-            font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
-            color: #fff;
-            font-size: 18px;
-        }
-        .ankur p {
-            text-align: center;
-            color: #cad2dd;
-            font-family: Georgia, 'Times New Roman', Times, serif;
-            font-size: 11px;
-        }
+    .axm-theme-midnight, .axm-theme-midnight.hopyn-excel-wrapper {
+        --axm-bg-app: #0f172a; --axm-surface: #1e293b; --axm-primary: #38bdf8;
+        --axm-primary-hover: #0284c7; --axm-header-bg: #334155; --axm-panel-border: #475569;
+        --axm-cell-border: #334155; --axm-selected-bg: #0369a1; --axm-row-even: #1e293b; --axm-row-odd: #0f172a;
+        --axm-text-main: #f8fafc; --axm-text-muted: #94a3b8;
+    }
 
-        .premium-container { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+    .axm-theme-crimson, .axm-theme-crimson.hopyn-excel-wrapper {
+        --axm-bg-app: #fff5f5; --axm-surface: #ffffff; --axm-primary: #991b1b;
+        --axm-primary-hover: #7f1d1d; --axm-header-bg: #991b1b; --axm-panel-border: #fca5a5;
+        --axm-cell-border: #fee2e2; --axm-selected-bg: #fecaca; --axm-row-even: #ffe4e4; --axm-row-odd: #ffffff;
+        --axm-text-main: #450a0a;
+    }
 
-        .executive-toolbar {
-            padding: 14px 24px; background: linear-gradient(#22314b, #65a3b6); border-bottom: 1px solid var(--panel-border);
-            display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); z-index: 10;
-        }
-        .toolbar-group { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .axm-theme-oceanic, .axm-theme-oceanic.hopyn-excel-wrapper {
+        --axm-bg-app: #f0f9ff; --axm-surface: #ffffff; --axm-primary: #0284c7;
+        --axm-primary-hover: #0369a1; --axm-header-bg: #0369a1; --axm-panel-border: #7dd3fc;
+        --axm-cell-border: #e0f2fe; --axm-selected-bg: #bae6fd; --axm-row-even: #e0f2fe; --axm-row-odd: #ffffff;
+        --axm-text-main: #0c4a6e;
+    }
 
-        .pipeline-status-strip {
-            background: #1e293b; color: #cbd5e1; padding: 6px 24px; font-size: 11px;
-            display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #334155;
-        }
+    .axm-theme-minimalist, .axm-theme-minimalist.hopyn-excel-wrapper {
+        --axm-bg-app: #fafafa; --axm-surface: #ffffff; --axm-primary: #3f3f46;
+        --axm-primary-hover: #18181b; --axm-header-bg: #f4f4f5; --axm-panel-border: #e4e4e7;
+        --axm-cell-border: #f4f4f5; --axm-selected-bg: #e4e4e7; --axm-row-even: #f8fafc; --axm-row-odd: #ffffff;
+        --axm-text-main: #27272a; --axm-text-muted: #71717a;
+    }
 
-        .filter-panel-strip {
-            background: #f1f5f9; padding: 8px 24px; display: flex; gap: 12px; align-items: center;
-            border-bottom: 1px solid var(--panel-border); font-size: 12px; flex-wrap: wrap;
-        }
-        .filter-input-select { padding: 4px 8px; border-radius: 4px; border: 1px solid var(--panel-border); font-size: 12px; min-width: 140px; }
-        .filter-search-box { padding: 4px 8px; border-radius: 4px; border: 1px solid var(--panel-border); font-size: 12px; width: 180px; }
+    .axm-theme-card, .axm-theme-card.hopyn-excel-wrapper {
+        --axm-bg-app: #f1f5f9; --axm-surface: #f8fafc; --axm-primary: #2563eb;
+        --axm-primary-hover: #1d4ed8; --axm-header-bg: #1e293b; --axm-panel-border: #cbd5e1;
+        --axm-cell-border: transparent; --axm-selected-bg: #dbeafe; --axm-row-even: #ffffff; --axm-row-odd: #f1f5f9;
+        --axm-text-main: #0f172a;
+    }
 
-        .shortcut-navbar {
-            background: #e2e8f0; color: #334155; padding: 4px 24px; font-size: 11px; font-weight: 500;
-            display: flex; gap: 16px; border-bottom: 1px solid #cbd5e1; align-items: center; flex-wrap: wrap;
-        }
-        .shortcut-badge { background: #cbd5e1; padding: 2px 6px; border-radius: 4px; font-family: monospace; font-weight: bold; }
+    .axm-theme-highcontrast, .axm-theme-highcontrast.hopyn-excel-wrapper {
+        --axm-bg-app: #090d16; --axm-surface: #111827; --axm-primary: #06b6d4;
+        --axm-primary-hover: #0891b2; --axm-header-bg: #1e1b4b; --axm-panel-border: #374151;
+        --axm-cell-border: #1f2937; --axm-selected-bg: #312e81; --axm-row-even: #111827; --axm-row-odd: #0f172a;
+        --axm-text-main: #f9fafb; --axm-text-muted: #9ca3af;
+    }
 
-        .file-input-container { position: relative; display: inline-block; }
-        input[type="file"]#excelFile { position: absolute; left: 0; top: 0; opacity: 0; width: 100%; height: 100%; cursor: pointer; }
-        .btn-file-dummy { padding: 9px 14px; background: #f1f5f9; border: 1px solid var(--panel-border); border-radius: 6px; font-weight: 500; }
+    .axm-theme-glass, .axm-theme-glass.hopyn-excel-wrapper {
+        --axm-bg-app: linear-gradient(135deg, #e0e7ff 0%, #f3e8ff 100%); 
+        --axm-surface: rgba(255, 255, 255, 0.85); --axm-primary: #6366f1;
+        --axm-primary-hover: #4f46e5; --axm-header-bg: rgba(99, 102, 241, 0.95); --axm-panel-border: rgba(255, 255, 255, 0.5);
+        --axm-cell-border: rgba(226, 232, 240, 0.6); --axm-selected-bg: rgba(199, 210, 254, 0.6); --axm-row-even: rgba(255, 255, 255, 0.4); --axm-row-odd: rgba(255, 255, 255, 0.75);
+        --axm-text-main: #1e1b4b; --axm-text-muted: #4338ca;
+    }
 
-        button {
-            padding: 9px 14px; font-weight: 600; border-radius: 6px; font-family: var(--font-family);
-            border: 1px solid var(--panel-border); background: var(--surface); cursor: pointer;
-            display: inline-flex; align-items: center; justify-content: center; gap: 6px; transition: all 0.2s;
-        }
-        button:disabled { opacity: 0.5; cursor: not-allowed; }
-        button.btn-primary { background-color: var(--primary); color: white; border-color: transparent; }
-        button.btn-primary:hover:not(:disabled) { background-color: var(--primary-hover); }
-        button.btn-action:hover:not(:disabled) { background-color: #f1f5f9; }
-        button.btn-danger { background-color: #ef4444; color: white; border-color: transparent; }
-        button.btn-danger:hover:not(:disabled) { background-color: #dc2626; }
-        button.btn-edit-mode { background-color: #ffe7f9; color: #150366; border-color: transparent; }
-        button.btn-edit-mode:hover { background-color: #150366; color: #ffe7f9; }
-        button.btn-edit-mode.active { background-color: #d97706; box-shadow: inset 0 2px 4px rgba(0,0,0,0.2); }
-        button.btn-ppt { background-color: #c2410c; color: white; border-color: transparent; }
-        button.btn-ppt:hover:not(:disabled) { background-color: #9a3412; }
+    /* Top Header Banner */
+    .axm-header-banner { 
+        background: #1e293b; 
+        padding: 6px 12px; 
+        width: 100%; 
+        height: 48px;
+        border-bottom: 1px solid #334155; 
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        flex-shrink: 0;
+    }
+    .axm-header-banner h2 { text-align: center; color: #fff; font-size: 16px; margin: 0; font-weight: 700; }
+    .axm-header-banner p { text-align: center; color: #cbd5e1; font-size: 11px; margin: 0; }
 
-        select.theme-selector { padding: 9px 12px; border-radius: 6px; border: 1px solid var(--panel-border); background: var(--surface); font-weight: 600; }
+    /* Toolbar Styling */
+    .abhi-toolbar-bar {
+        padding: 6px 12px; background: linear-gradient(#1e293b, #334155); border-bottom: 1px solid var(--axm-panel-border);
+        display: flex; flex-wrap: wrap; gap: 6px; align-items: center; justify-content: space-between;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); z-index: 10; width: 100%; color: white; flex-shrink: 0;
+    }
+    .axm-toolbar-group { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
 
-        .grid-viewport-wrapper { 
-            flex: 1; 
-            width: 100%; 
-            overflow: auto; 
-            position: relative; 
-            background-color: var(--bg-app); 
-        }
+    /* Formula Bar Styling */
+    .shmh-formula-container {
+        display: flex; align-items: center; gap: 8px; background: var(--axm-surface);
+        padding: 5px 12px; border-bottom: 1px solid var(--axm-panel-border); font-size: 13px; width: 100%; flex-shrink: 0;
+    }
+    .dowa-cell-address {
+        width: 60px; padding: 3px 6px; font-weight: 700; text-align: center;
+        background: var(--axm-bg-app); border: 1px solid var(--axm-panel-border); border-radius: 4px;
+        color: var(--axm-primary); font-family: monospace; font-size: 12px;
+    }
+    .ghy-formula-input {
+        flex: 1; padding: 4px 8px; border: 1px solid var(--axm-panel-border); border-radius: 4px;
+        font-family: 'Segoe UI', monospace; font-size: 13px; outline: none; background: var(--axm-surface); color: var(--axm-text-main);
+    }
+    .ghy-formula-input:focus { border-color: var(--axm-primary); box-shadow: 0 0 0 2px rgba(16, 124, 65, 0.2); }
 
-        .canvas-grid-engine { position: relative; width: 100%; height: 100%; background: var(--surface); }
+    .hopyn-status-strip {
+        background: #0f172a; color: #cbd5e1; padding: 4px 12px; font-size: 11px;
+        display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #334155; width: 100%; flex-shrink: 0;
+    }
 
-        .merge-title-container {
-            position: absolute; left: 0; right: 0; background: var(--surface);
-            border-bottom: 2px solid var(--panel-border); height: 44px; display: flex; align-items: center; z-index: 6;
-        }
-        .merge-title-banner {
-            width: 100%; height: 100%; padding: 0 16px; font-size: 15px; font-weight: 700;
-            color: var(--text-main); display: flex; align-items: center; letter-spacing: 0.5px;
-            text-transform: uppercase; cursor: pointer;
-        }
-        .merge-title-input { width: 100%; height: 100%; padding: 0 16px; font-size: 15px; font-weight: 700; border: 2px solid var(--primary); outline: none; }
-        .merge-title-banner.placeholder { color: var(--text-muted); font-style: italic; font-weight: 500; text-transform: none; }
+    .abhi-filter-strip {
+        background: var(--axm-surface); padding: 5px 12px; display: flex; gap: 8px; align-items: center;
+        border-bottom: 1px solid var(--axm-panel-border); font-size: 12px; flex-wrap: wrap; width: 100%; color: var(--axm-text-main); flex-shrink: 0;
+    }
+    .axm-filter-select, .shmh-filter-search { 
+        padding: 3px 6px; border-radius: 4px; border: 1px solid var(--axm-panel-border); 
+        font-size: 12px; background: var(--axm-surface); color: var(--axm-text-main); 
+    }
 
-        .cell {
-            position: absolute; padding: 6px 10px;
-            border-right: 1px solid var(--cell-border); border-bottom: 1px solid var(--cell-border);
-            font-size: 13px; display: flex; align-items: center; justify-content: flex-start; box-sizing: border-box;
-            white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.3;
-        }
-        
-        .cell.table-header { 
-            background-color: var(--header-bg) !important; 
-            font-weight: 700; 
-            letter-spacing: 0.6px;
-            text-transform: uppercase;
-            font-size: 12px;
-            border-bottom: 2px solid var(--primary); z-index: 2;
-        }
+    .dowa-shortcut-bar {
+        background: var(--axm-bg-app); color: var(--axm-text-muted); padding: 3px 12px; font-size: 11px; font-weight: 500;
+        display: flex; gap: 12px; border-bottom: 1px solid var(--axm-panel-border); align-items: center; flex-wrap: wrap; width: 100%; flex-shrink: 0;
+    }
+    .ghy-shortcut-badge { background: var(--axm-panel-border); color: var(--axm-text-main); padding: 1px 4px; border-radius: 3px; font-family: monospace; font-weight: bold; }
 
-        body.theme-teal-dashboard .cell.table-header,
-        body.theme-financial .cell.table-header,
-        body.theme-emerald .cell.table-header,
-        body.theme-progress .cell.table-header { color: #ffffff !important; }
+    .hopyn-file-container { position: relative; display: inline-block; }
+    .hopyn-file-container input[type="file"] { position: absolute; left: 0; top: 0; opacity: 0; width: 100%; height: 100%; cursor: pointer; }
+    .abhi-file-dummy-btn { padding: 5px 8px; background: #334155; color: #ffffff; border: 1px solid var(--axm-panel-border); border-radius: 5px; font-weight: 600; white-space: nowrap; font-size: 11px; }
 
-        .cell.selected { outline: 2px solid var(--primary) !important; z-index: 3; }
-        .cell.multi-selected { outline: 2px dashed var(--primary) !important; background-color: var(--selected-bg) !important; z-index: 2; }
-        .cell.style-bold { font-weight: bold !important; }
+    /* Isolated App Buttons */
+    .hopyn-excel-wrapper button {
+        padding: 5px 8px; font-weight: 600; border-radius: 5px; font-family: var(--axm-font-family);
+        border: 1px solid var(--axm-panel-border); background: var(--axm-surface); color: var(--axm-text-main); cursor: pointer;
+        display: inline-flex; align-items: center; justify-content: center; gap: 4px; transition: all 0.15s; white-space: nowrap; font-size: 11px;
+    }
+    .hopyn-excel-wrapper button:disabled { opacity: 0.5; cursor: not-allowed !important; filter: grayscale(1); }
+    button.axm-btn-primary { background-color: var(--axm-primary); color: white; border-color: transparent; }
+    button.axm-btn-primary:hover:not(:disabled) { background-color: var(--axm-primary-hover); }
+    button.shmh-btn-danger { background-color: #ef4444; color: white; border-color: transparent; }
+    button.shmh-btn-danger:hover:not(:disabled) { background-color: #dc2626; }
+    button.dowa-btn-edit-mode { background-color: #fef08a; color: #854d0e; border-color: transparent; font-weight: 700; }
+    button.dowa-btn-edit-mode.dowa-active { background-color: #10b981; color: white; }
+    button.ghy-btn-ppt { background-color: #ea580c; color: white; border-color: transparent; }
+    button.abhi-btn-toggle { padding: 3px 6px; font-weight: 700; min-width: 24px; }
 
-        .cell-input-editor { position: absolute; display: none; z-index: 100; border: 2px solid var(--primary); background: white; outline: none; padding: 4px; font-size: 13px; }
+    select.shmh-theme-select, select.dowa-tool-select { 
+        padding: 4px 6px; border-radius: 5px; border: 1px solid var(--axm-panel-border); 
+        background: var(--axm-surface); color: var(--axm-text-main); font-weight: 600; font-size: 11px; 
+    }
 
-        .custom-alert-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(15, 23, 42, 0.4); display: none; justify-content: center;
-            align-items: center; z-index: 9999; backdrop-filter: blur(2px);
-        }
-        .custom-alert-box {
-            background: white; padding: 20px 30px; border-radius: 8px;
-            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1); text-align: center;
-            max-width: 400px; border: 1px solid var(--panel-border);
-        }
-        .custom-alert-msg { font-size: 14px; font-weight: 600; color: var(--text-main); margin-bottom: 16px; }
-    </style>
-</head>
-<body class="theme-emerald">
-    <div class="ankur">
-        <h2>Excel Engine Designer</h2>
-        <p>Created and developed by Ankur Dowarah</p>
-        <p>Current Version 1.50</p>
-    </div>
-<div class="premium-container">
-    <div class="executive-toolbar">
-        <div class="toolbar-group">
-            <div class="file-input-container">
-                <div class="btn-file-dummy">Drop your file here</div>
-                <input type="file" id="excelFile" accept=".csv,.xlsx" onchange="this.previousElementSibling.textContent = this.files[0]?.name || 'Choose Document'" />
+    /* Grid Viewport & Canvas */
+    .ghy-viewport-wrapper { 
+        flex: 1; 
+        width: 100%; 
+        max-width: 100%;
+        overflow: auto; 
+        position: relative; 
+        background: var(--axm-bg-app); 
+    }
+    
+    .hopyn-canvas-engine { position: relative; height: 100%; min-height: 500px; min-width: max-content; background: var(--axm-surface); display: block; }
+
+    .abhi-title-container {
+        position: absolute; left: 0; background: var(--axm-surface);
+        border-bottom: 2px solid var(--axm-panel-border); height: 40px; display: flex; align-items: center; z-index: 6;
+    }
+    .axm-title-banner {
+        width: 100%; height: 100%; padding: 0 12px; font-size: 14px; font-weight: 700;
+        color: var(--axm-text-main); display: flex; align-items: center; letter-spacing: 0.5px;
+        text-transform: uppercase; cursor: pointer;
+    }
+    .shmh-title-input { width: 100%; height: 100%; padding: 0 12px; font-size: 14px; font-weight: 700; border: 2px solid var(--axm-primary); outline: none; background: var(--axm-surface); color: var(--axm-text-main); }
+
+    /* Cell Visual Engine */
+    .axm-cell {
+        position: absolute; padding: 4px 8px;
+        border-right: 1px solid var(--axm-cell-border); border-bottom: 1px solid var(--axm-cell-border);
+        font-size: 12px; display: flex; align-items: center; justify-content: flex-start; box-sizing: border-box;
+        white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.2; color: var(--axm-text-main);
+    }
+    
+    .axm-cell.shmh-table-header { 
+        background-color: var(--axm-header-bg) !important; font-weight: 700; 
+        letter-spacing: 0.5px; text-transform: uppercase; font-size: 11px;
+        border-bottom: 2px solid var(--axm-primary); z-index: 5; color: #ffffff !important;
+    }
+
+    .axm-cell.dowa-selected { outline: 2px solid var(--axm-primary) !important; z-index: 4; }
+    .axm-cell.ghy-multi-selected { outline: 2px dashed var(--axm-primary) !important; background-color: var(--axm-selected-bg) !important; z-index: 3; }
+    .dowa-cell-editor { position: absolute; display: none; z-index: 100; border: 2px solid var(--axm-primary); background: white; outline: none; padding: 4px; font-size: 12px; color: black; }
+
+    /* Floating Overlay Picture Engine */
+    .ghy-floating-image {
+        position: absolute; border: 2px dashed var(--axm-primary); box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        cursor: move; z-index: 20; background: white; background-size: contain; background-repeat: no-repeat; background-position: center;
+    }
+    .hopyn-image-del-btn {
+        position: absolute; top: -10px; right: -10px; background: #ef4444; color: white;
+        border-radius: 50%; width: 20px; height: 20px; font-size: 11px; font-weight: bold;
+        display: flex; align-items: center; justify-content: center; cursor: pointer; border: 1px solid white;
+    }
+
+    /* HIGH-CONTRAST ALERT DIALOG */
+    .abhi-alert-overlay {
+        position: fixed; 
+        top: 0; 
+        left: 0; 
+        width: 100vw; 
+        height: 100vh;
+        background: rgba(15, 23, 42, 0.75); 
+        display: none; 
+        justify-content: center;
+        align-items: center; 
+        z-index: 999999; 
+        backdrop-filter: blur(6px);
+        opacity: 1 !important;
+    }
+    .axm-alert-box {
+        background: #ffffff !important; 
+        padding: 24px 28px; 
+        border-radius: 12px;
+        box-shadow: 0 20px 30px -5px rgba(0, 0, 0, 0.4), 0 10px 15px -5px rgba(0, 0, 0, 0.2); 
+        text-align: center;
+        max-width: 420px; 
+        width: 90%; 
+        border: 2px solid #2563eb; 
+        color: #0f172a !important;
+        opacity: 1 !important;
+        transform: scale(1);
+        position: relative;
+        z-index: 1000000;
+    }
+    .shmh-alert-msg { 
+        font-size: 15px; 
+        font-weight: 600; 
+        margin-bottom: 20px; 
+        color: #0f172a !important;
+        line-height: 1.5;
+        opacity: 1 !important;
+    }
+    .dowa-modal-input { 
+        width: 100%; 
+        padding: 8px 12px; 
+        border: 1px solid #cbd5e1; 
+        border-radius: 6px; 
+        margin-bottom: 14px; 
+        outline: none; 
+        font-size: 13px;
+        color: #0f172a !important;
+        background: #f8fafc !important;
+    }
+    .dowa-modal-input:focus {
+        border-color: #2563eb;
+        box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+    }
+
+    .abhi-alert-overlay button {
+        padding: 8px 18px; 
+        font-weight: 700; 
+        border-radius: 6px; 
+        font-size: 13px;
+        cursor: pointer;
+        border: none;
+        transition: all 0.15s ease;
+    }
+    .abhi-alert-overlay button.axm-btn-primary {
+        background-color: #2563eb !important;
+        color: #ffffff !important;
+    }
+    .abhi-alert-overlay button.axm-btn-primary:hover {
+        background-color: #1d4ed8 !important;
+    }
+    .abhi-alert-overlay button.shmh-btn-danger {
+        background-color: #ef4444 !important;
+        color: #ffffff !important;
+    }
+    .abhi-alert-overlay button.shmh-btn-danger:hover {
+        background-color: #dc2626 !important;
+    }
+</style>
+
+<div class="axm-header-banner">
+    <h2>Excel Engine Pro</h2>
+    <p>Created and developed by Ankur Dowarah | Integrated REST Backend</p>
+</div>
+
+<div class="hopyn-excel-wrapper axm-theme-emerald" id="hopyn-excel-app-root">
+    <!-- Main Executive Toolbar -->
+    <div class="abhi-toolbar-bar">
+        <div class="axm-toolbar-group">
+            <div class="hopyn-file-container">
+                <div class="abhi-file-dummy-btn">📁 Drop / Select File</div>
+                <input type="file" id="excelFile" accept=".csv,.xlsx,.xls" onchange="this.previousElementSibling.textContent = this.files[0]?.name || '📁 Select File'" />
             </div>
-            <button class="btn-primary" onclick="handleUpload()">Upload</button>
-            <select class="theme-selector" id="themeSelect" onchange="applyGlobalTheme(this.value)">
+            <button class="axm-btn-primary" onclick="handleUpload()">Upload Excel</button>
+            <select class="shmh-theme-select" id="themeSelect" onchange="applyGlobalTheme(this.value)">
                 <option value="emerald">🟢 Emerald Classic</option>
                 <option value="progress">🌾 Minimal Progress</option>
                 <option value="teal-dashboard">🌲 Deep Teal Dashboard</option>
                 <option value="financial">📊 Financial Performance</option>
+                <option value="midnight">🌌 Midnight Slate</option>
+                <option value="crimson">🍷 Sunset Crimson</option>
+                <option value="oceanic">🌊 Oceanic Blue</option>
+                <option value="minimalist">🕊️ Minimalist & Borderless</option>
+                <option value="card">🎴 Card & Tile Grid</option>
+                <option value="highcontrast">⚡ High-Contrast Bold Accent</option>
+                <option value="glass">🔮 Neomorphic / Glassmorphism</option>
             </select>
         </div>
         
-        <div class="toolbar-group">
-            <button id="editModeBtn" class="btn-edit-mode" onclick="toggleEditMode()">🔒 Read Only</button>
-            <button id="addRowBtn" class="btn-action" onclick="Ank19_Mutator.insertRow()" disabled>➕ Add Row</button>
-            <button id="addColBtn" class="btn-action" onclick="Ank19_Mutator.insertColumn()" disabled>➕ Add Column</button>
-            <button id="delRowBtn" class="btn-danger" onclick="Ank19_Mutator.deleteRow()" disabled>❌ Delete Row</button>
-            <button id="delColBtn" class="btn-danger" onclick="Ank19_Mutator.deleteColumn()" disabled>❌ Delete Column</button>
-            <input type="color" id="customColorPicker" value="#e2f0d9" style="width:32px; height:32px; border:1px solid var(--panel-border); border-radius:4px; cursor:pointer;" disabled>
-            <button id="tintBtn" class="btn-action" onclick="Ank19_Mutator.applyFormat()" disabled>🎨 Apply Custom Tint</button>
-            <button class="btn-action" onclick="performExport()">Export Excel</button>
-            <button class="btn-ppt" onclick="performPPTXExport()">📊 PPTX Slide</button>
+        <div class="axm-toolbar-group">
+            <!-- READ-ONLY TOGGLE -->
+            <button id="editModeBtn" class="dowa-btn-edit-mode" onclick="toggleEditMode()">🔒 Read Only</button>
+            
+            <!-- Font Family & Font Size Selectors -->
+            <select id="fontFamilySelect" class="dowa-tool-select" onchange="Ank19_Mutator.applyFontFamily(this.value)" disabled>
+                <option value="-apple-system, sans-serif">Default Font</option>
+                <option value="Segoe UI">Segoe UI</option>
+                <option value="Arial">Arial</option>
+                <option value="Roboto">Roboto</option>
+                <option value="Courier New">Courier New</option>
+                <option value="Georgia">Georgia</option>
+                <option value="Impact">Impact</option>
+            </select>
+
+            <select id="fontSizeSelect" class="dowa-tool-select" onchange="Ank19_Mutator.applyFontSize(this.value)" disabled>
+                <option value="11px">11px</option>
+                <option value="12px">12px</option>
+                <option value="13px" selected>13px</option>
+                <option value="14px">14px</option>
+                <option value="16px">16px</option>
+                <option value="18px">18px</option>
+                <option value="20px">20px</option>
+                <option value="24px">24px</option>
+            </select>
+
+            <!-- Text Formatting Controls -->
+            <button id="boldBtn" class="abhi-btn-toggle" onclick="Ank19_Mutator.toggleBold()" disabled><b>B</b></button>
+            <button id="italicBtn" class="abhi-btn-toggle" onclick="Ank19_Mutator.toggleItalic()" disabled><i>I</i></button>
+            <button id="alignLeftBtn" class="abhi-btn-toggle" onclick="Ank19_Mutator.setAlign('left')" disabled>⯇</button>
+            <button id="alignCenterBtn" class="abhi-btn-toggle" onclick="Ank19_Mutator.setAlign('center')" disabled>≡</button>
+            <button id="alignRightBtn" class="abhi-btn-toggle" onclick="Ank19_Mutator.setAlign('right')" disabled>⯈</button>
+
+            <!-- Insert Image -->
+            <div class="hopyn-file-container">
+                <button id="insertImgDummyBtn" class="axm-btn-action" disabled>🖼️ Insert Image</button>
+                <input type="file" id="imageFileInput" accept="image/*" onchange="Ank19_Mutator.handleImageUpload(event)" disabled />
+            </div>
+
+            <!-- Relative Insertions -->
+            <button id="addRowBtn" class="axm-btn-action" onclick="Ank19_Mutator.insertRow()" disabled>➕ Row (Above)</button>
+            <button id="addColBtn" class="axm-btn-action" onclick="Ank19_Mutator.insertColumn()" disabled>➕ Col (Left)</button>
+            <button id="delRowBtn" class="shmh-btn-danger" onclick="Ank19_Mutator.deleteRow()" disabled>❌ Del Row</button>
+            <button id="delColBtn" class="shmh-btn-danger" onclick="Ank19_Mutator.deleteColumn()" disabled>❌ Del Col</button>
+            
+            <input type="color" id="customColorPicker" value="#e2f0d9" style="width:26px; height:26px; border:1px solid var(--axm-panel-border); border-radius:4px; cursor:pointer;" disabled>
+            <button id="tintBtn" class="axm-btn-action" onclick="Ank19_Mutator.applyFormat()" disabled>🎨 Tint</button>
+
+            <button class="axm-btn-action" onclick="performExport()">📥 Excel / CSV</button>
+            <button class="ghy-btn-ppt" onclick="performPPTXExport()">📊 PPTX</button>
+          <!-- Undo & Redo Controls -->
+<button id="undoBtn" class="abhi-btn-toggle" onclick="Ank19_HistoryEngine.undo()" title="Undo (Ctrl+Z)" disabled>↩️</button>
+<button id="redoBtn" class="abhi-btn-toggle" onclick="Ank19_HistoryEngine.redo()" title="Redo (Ctrl+Y)" disabled>↪️</button>
         </div>
+      
+    </div>
+
+    <!-- Formula Bar Engine -->
+    <div class="shmh-formula-container">
+        <div id="activeCellAddress" class="dowa-cell-address">A1</div>
+        <span style="font-weight:700; color:var(--axm-text-muted);">fx</span>
+        <input type="text" id="formulaInput" class="ghy-formula-input" placeholder="Enter value or formula (e.g. =SUM(A1:A5) or =10+20)" oninput="Ank19_FormulaEngine.onInput(this.value)" onkeydown="Ank19_FormulaEngine.onKeyDown(event)" disabled />
     </div>
     
-    <div class="pipeline-status-strip">
-        <div id="paginationInfo">Columns Page: 0/0</div>
+    <!-- Pagination Info Strip -->
+    <div class="hopyn-status-strip">
+        <div id="paginationInfo">Rows Visited: 0 | Columns Page: 0/0</div>
         <div>
-            <button style="padding:2px 6px; font-size:10px;" onclick="Ank19_ColumnPager.prevPage()">◀</button>
-            <button style="padding:2px 6px; font-size:10px;" onclick="Ank19_ColumnPager.nextPage()">▶</button>
+            <button style="padding:2px 8px; font-size:11px;" onclick="Ank19_ColumnPager.prevPage()">◀ Prev</button>
+            <button style="padding:2px 8px; font-size:11px;" onclick="Ank19_ColumnPager.nextPage()">Next ▶</button>
         </div>
     </div>
 
-   <div class="filter-panel-strip">
-        <strong>⚡ Filter Data Grid:</strong>
-        <select id="filterColumnSelect" class="filter-input-select" onchange="Ank19_FilterEngine.handleColumnChange()">
-            <option value="-1">-- Choose Column --</option>
+    <!-- Filter View Engine & Search Replace -->
+    <div class="abhi-filter-strip">
+        <strong>🔍 Filter Engine:</strong>
+        <select id="filterColumnSelect" class="axm-filter-select" onchange="Ank19_FilterEngine.handleColumnChange()">
+            <option value="-1">-- Filter View: All Columns --</option>
         </select>
         
-        <select id="filterSubSelect" class="filter-input-select" onchange="Ank19_FilterEngine.applyFilter()">
-            <option value="-1">-- Choose Sub-Filter --</option>
+        <select id="filterSubSelect" class="axm-filter-select" onchange="Ank19_FilterEngine.applyFilter()">
+            <option value="-1">-- Sub Filter: Value --</option>
         </select>
 
-        <input type="text" id="filterSearchInput" class="filter-search-box" placeholder="Primary Sub-Filter query..." oninput="Ank19_FilterEngine.applyFilter()">
-        <button class="btn-action" style="padding: 4px 10px;" onclick="Ank19_FilterEngine.clearFilter()">Clear Filter</button>
+        <input type="text" id="filterSearchInput" class="shmh-filter-search" placeholder="Filter query term..." oninput="Ank19_FilterEngine.applyFilterDebounced()">
+        <button class="shmh-btn-danger" style="padding: 3px 8px;" onclick="Ank19_FilterEngine.clearFilter()">🧹 Clear</button>
+
+        <button class="axm-btn-action" style="margin-left:auto; padding: 3px 10px;" onclick="openSearchReplaceModal()">🔍 Search & Replace</button>
     </div>
 
-    <div class="shortcut-navbar">
-        <div><strong>Quick Actions:</strong></div>
-        <div><span class="shortcut-badge">Alt + C</span> Select Column</div>
-        <div><span class="shortcut-badge">Alt + R</span> Select Row</div>
-        <div><span class="shortcut-badge">Alt + A</span> Select All Cells</div>
-        <div><span class="shortcut-badge">Alt + D</span> Deselect All</div>
+    <!-- Quick Action Bar -->
+    <div class="dowa-shortcut-bar">
+        <div class="axm-toolbar-group">
+            <strong>⚡ Quick Actions:</strong>
+            <span class="ghy-shortcut-badge">Alt + C</span> Select Col
+            <span class="ghy-shortcut-badge">Alt + R</span> Select Row
+            <span class="ghy-shortcut-badge">Alt + A</span> Select All
+            <span class="ghy-shortcut-badge">Alt + D</span> Deselect All
+        </div>
         <div style="margin-left: auto;" id="selectionTrackerStatus">Active Target: None</div>
     </div>
     
-    <textarea id="Ank19-CellEditor" class="cell-input-editor"></textarea>
+    <textarea id="Ank19-CellEditor" class="dowa-cell-editor"></textarea>
 
-    <div class="grid-viewport-wrapper" id="Ank-Viewport-Wrapper">
-        <div class="canvas-grid-engine" id="Ank-Canvas"></div>
+    <!-- Main Viewport -->
+    <div class="ghy-viewport-wrapper" id="Ank-Viewport-Wrapper">
+        <div class="hopyn-canvas-engine" id="Ank-Canvas"></div>
+    </div>
+</div>
+<div id="ank19-alert-overlay" class="abhi-alert-overlay">
+    <div class="axm-alert-box">
+        <div id="ank19-alert-message" class="shmh-alert-msg">Notification Message</div>
+        <button class="axm-btn-primary" onclick="closeCustomAlert()">OK</button>
+    </div>
+</div>
+<div id="ank19-search-overlay" class="abhi-alert-overlay">
+    <div class="axm-alert-box">
+        <h3 style="margin-bottom:14px; color:#0f172a; font-size:16px;">Search & Replace</h3>
+        <input type="text" id="findInputModal" class="dowa-modal-input" placeholder="Find text..." />
+        <input type="text" id="replaceInputModal" class="dowa-modal-input" placeholder="Replace with..." />
+        <div style="display:flex; gap:10px; justify-content:center;">
+            <button class="axm-btn-primary" onclick="performSearchAndReplace()">Replace All</button>
+            <button class="shmh-btn-danger" onclick="closeSearchReplaceModal()">Cancel</button>
+        </div>
     </div>
 </div>
 
-<div id="ank19-alert-overlay" class="custom-alert-overlay">
-    <div class="custom-alert-box">
-        <div id="ank19-alert-message" class="custom-alert-msg">Notification Message</div>
-        <button class="btn-primary" style="padding: 6px 18px;" onclick="closeCustomAlert()">OK</button>
-    </div>
-</div>
 <script>
 let CURRENT_WB_ID = null;
 let HEADER_OFFSET = 0;
-let Ank19_Worker = null;
 let SELECTED_THEME = "emerald";
-let IS_EDIT_MODE = false;
+
+// FILE LOADED STATE GUARD
+let IS_FILE_LOADED = false;
+
+// READ ONLY MODE ACTIVE BY DEFAULT
+let IS_EDIT_MODE = false; 
+
 let EXCEL_MERGE_TITLE = ""; 
 let IS_TITLE_EDITING = false;
 
-const GLOB_CHUNK_CACHE = new Map();
 const SESSION_DELTAS = new Map();
+const FORMULA_DELTAS = new Map();
 let SELECTED_CELLS_SET = new Set(); 
+let FLOATING_IMAGES = []; 
+
+// REST API BASE
 const API_BASE = "https://excel-designer-engine.onrender.com";
+let syncTimeout = null;
+let filterTimeout = null;
 
 function showCustomAlert(msg) {
     document.getElementById("ank19-alert-message").textContent = msg;
-    document.getElementById("ank19-alert-overlay").style.display = "flex";
+    const overlay = document.getElementById("ank19-alert-overlay");
+    overlay.style.display = "flex";
 }
 
 function closeCustomAlert() {
     document.getElementById("ank19-alert-overlay").style.display = "none";
 }
 
+function openSearchReplaceModal() {
+    if (!IS_FILE_LOADED) return showCustomAlert("Upload Excel file first");
+    if (!IS_EDIT_MODE) return showCustomAlert("Please enable Live Editing to use Search & Replace.");
+    document.getElementById("ank19-search-overlay").style.display = "flex";
+}
+
+function closeSearchReplaceModal() {
+    document.getElementById("ank19-search-overlay").style.display = "none";
+}
+
 document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("themeSelect").value = SELECTED_THEME;
+    applyGlobalTheme(SELECTED_THEME);
     setupKeyboardShortcuts();
+    Ank19_Renderer.requestRender();
 });
+
+function applyGlobalTheme(themeName) {
+    SELECTED_THEME = themeName;
+    const root = document.getElementById("hopyn-excel-app-root");
+    root.className = `hopyn-excel-wrapper axm-theme-${themeName}`;
+}
+
+function toggleEditMode() {
+    if (!IS_FILE_LOADED) {
+        showCustomAlert("Upload Excel file first");
+        return;
+    }
+
+    IS_EDIT_MODE = !IS_EDIT_MODE;
+    const btn = document.getElementById("editModeBtn");
+    const inputsToToggle = [
+        "fontFamilySelect", "fontSizeSelect", "boldBtn", "italicBtn", 
+        "alignLeftBtn", "alignCenterBtn", "alignRightBtn", "insertImgDummyBtn", 
+        "imageFileInput", "addRowBtn", "addColBtn", "delRowBtn", "delColBtn", 
+        "customColorPicker", "tintBtn", "formulaInput"
+    ];
+
+    if (IS_EDIT_MODE) {
+        btn.textContent = "🔓 Live Editing";
+        btn.classList.add("dowa-active");
+        inputsToToggle.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.removeAttribute("disabled");
+        });
+    } else {
+        btn.textContent = "🔒 Read Only";
+        btn.classList.remove("dowa-active");
+        inputsToToggle.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.setAttribute("disabled", "true");
+        });
+    }
+}
 
 function setupKeyboardShortcuts() {
     window.addEventListener("keydown", (e) => {
         if (e.altKey) {
             const key = e.key.toLowerCase();
-            if (key === 'c') {
-                e.preventDefault();
-                Ank19_SelectionEngine.selectColumn();
-            } else if (key === 'r') {
-                e.preventDefault();
-                Ank19_SelectionEngine.selectRow();
-            } else if (key === 'a') {
-                e.preventDefault();
-                Ank19_SelectionEngine.selectAll();
-            } else if (key === 'd') {
-                e.preventDefault();
-                Ank19_SelectionEngine.deselectAll();
-            }
+            if (key === 'c') { e.preventDefault(); Ank19_SelectionEngine.selectColumn(); }
+            else if (key === 'r') { e.preventDefault(); Ank19_SelectionEngine.selectRow(); }
+            else if (key === 'a') { e.preventDefault(); Ank19_SelectionEngine.selectAll(); }
+            else if (key === 'd') { e.preventDefault(); Ank19_SelectionEngine.deselectAll(); }
         }
     });
 }
 
+function colToLetter(col) {
+    let temp, letter = '';
+    while (col >= 0) {
+        temp = col % 26;
+        letter = String.fromCharCode(temp + 65) + letter;
+        col = Math.floor((col - temp) / 26) - 1;
+    }
+    return letter;
+}
+
+function letterToCol(letter) {
+    let column = 0;
+    const length = letter.length;
+    for (let i = 0; i < length; i++) {
+        column += (letter.charCodeAt(i) - 64) * Math.pow(26, length - i - 1);
+    }
+    return column - 1;
+}
+
+function parseCellRef(ref) {
+    const match = ref.toUpperCase().match(/^([A-Z]+)(\d+)$/);
+    if (!match) return null;
+    return {
+        col: letterToCol(match[1]),
+        row: parseInt(match[2], 10)
+    };
+}
+
 const Ank19_State = {
-    meta: { rows: 0, cols: 0, headers: [] },
+    meta: { rows: 20, cols: 10, headers: ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"] },
     activeRow: 1,
     activeCol: 0,
     styles: {},
     
     getCell(r, c) {
-        if (r === 0) return { v: this.meta.headers[c] || "" };
+        if (r === 0) return { v: this.meta.headers[c] || colToLetter(c) };
         const deltaKey = `${r}-${c}`;
+        
+        if (FORMULA_DELTAS.has(deltaKey)) {
+            const formulaStr = FORMULA_DELTAS.get(deltaKey);
+            const evaluated = Ank19_FormulaEngine.evaluate(formulaStr);
+            return { v: evaluated, formula: formulaStr };
+        }
+
         if (SESSION_DELTAS.has(deltaKey)) return { v: SESSION_DELTAS.get(deltaKey) };
         return { v: "" };
     },
     
     setCell(r, c, val) {
-        if (!CURRENT_WB_ID) return;
+        if (!IS_FILE_LOADED) {
+            showCustomAlert("Upload Excel file first");
+            return;
+        }
+        if (!IS_EDIT_MODE) {
+            showCustomAlert("Editing is blocked in Read-Only mode. Toggle '🔒 Read Only' to make changes.");
+            return;
+        }
+        if (!CURRENT_WB_ID) CURRENT_WB_ID = "wb_" + Date.now();
+        
         if (r === 0) {
             this.meta.headers[c] = val;
-            this.syncWithBackend();
+            this.syncWithBackendDebounced();
+            Ank19_ColumnPager.calculateAutoWidths();
             Ank19_Renderer.requestRender();
             return;
         }
-        SESSION_DELTAS.set(`${r}-${c}`, val);
-        this.syncWithBackend();
+
+        const deltaKey = `${r}-${c}`;
+        if (String(val).startsWith("=")) {
+            FORMULA_DELTAS.set(deltaKey, val);
+            const evalVal = Ank19_FormulaEngine.evaluate(val);
+            SESSION_DELTAS.set(deltaKey, evalVal);
+        } else {
+            FORMULA_DELTAS.delete(deltaKey);
+            SESSION_DELTAS.set(deltaKey, val);
+        }
+
+        this.syncWithBackendDebounced();
+        Ank19_ColumnPager.calculateAutoWidths();
+        Ank19_FormulaEngine.updateBar();
         Ank19_Renderer.requestRender();
     },
 
-    syncWithBackend() {
-        fetch(`${API_BASE}/api/api/mutate/${CURRENT_WB_ID}`, {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({
-                data: Object.fromEntries(SESSION_DELTAS),
-                headers_array: this.meta.headers,
-                styles: this.styles,
-                title: EXCEL_MERGE_TITLE
-            })
-        });
+    syncWithBackendDebounced() {
+        clearTimeout(syncTimeout);
+        syncTimeout = setTimeout(() => this.syncWithBackend(), 500);
+    },
+
+    async syncWithBackend() {
+        if (!CURRENT_WB_ID) return;
+        try {
+            const response = await fetch(`${API_BASE}/api/mutate/${CURRENT_WB_ID}`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    data: Object.fromEntries(SESSION_DELTAS),
+                    headers_array: this.meta.headers,
+                    styles: this.styles,
+                    title: EXCEL_MERGE_TITLE
+                })
+            });
+            if (!response.ok) throw new Error(`Server returned code ${response.status}`);
+        } catch (e) {
+            console.error("Sync error:", e);
+        }
     }
 };
 
-const Ank19_FilterEngine = {
-    filteredRows: null, 
+const Ank19_FormulaEngine = {
+    evaluate(expr) {
+        if (!expr.startsWith("=")) return expr;
+        const cleanExpr = expr.substring(1).trim();
 
-    handleColumnChange() {
-        const colIdx = parseInt(document.getElementById("filterColumnSelect").value);
-        const subSelect = document.getElementById("filterSubSelect");
-        
-        subSelect.innerHTML = '<option value="-1">-- Choose Sub-Filter --</option>';
-        
-        if (colIdx !== -1) {
-            const uniqueValues = new Set();
-            for (let r = 1; r <= Ank19_State.meta.rows; r++) {
-                const val = String(Ank19_State.getCell(r, colIdx).v).trim();
-                if (val) uniqueValues.add(val);
-            }
+        const fnMatch = cleanExpr.match(/^(SUM|AVERAGE|AVG|COUNT|MIN|MAX)\(([A-Z0-9:]+)\)$/i);
+        if (fnMatch) {
+            const fnName = fnMatch[1].toUpperCase();
+            const range = fnMatch[2];
+            const parts = range.split(":");
             
-            Array.from(uniqueValues).sort().forEach(val => {
-                const opt = document.createElement("option");
-                opt.value = val;
-                opt.textContent = val;
-                subSelect.appendChild(opt);
+            let cells = [];
+            if (parts.length === 2) {
+                const start = parseCellRef(parts[0]);
+                const end = parseCellRef(parts[1]);
+                if (start && end) {
+                    const minR = Math.min(start.row, end.row);
+                    const maxR = Math.max(start.row, end.row);
+                    const minC = Math.min(start.col, end.col);
+                    const maxC = Math.max(start.col, end.col);
+
+                    for (let r = minR; r <= maxR; r++) {
+                        for (let c = minC; c <= maxC; c++) {
+                            const val = parseFloat(Ank19_State.getCell(r, c).v);
+                            if (!isNaN(val)) cells.push(val);
+                        }
+                    }
+                }
+            } else if (parts.length === 1) {
+                const p = parseCellRef(parts[0]);
+                if (p) {
+                    const val = parseFloat(Ank19_State.getCell(p.row, p.col).v);
+                    if (!isNaN(val)) cells.push(val);
+                }
+            }
+
+            if (cells.length === 0) return 0;
+            if (fnName === "SUM") return cells.reduce((a, b) => a + b, 0);
+            if (fnName === "AVERAGE" || fnName === "AVG") return cells.reduce((a, b) => a + b, 0) / cells.length;
+            if (fnName === "COUNT") return cells.length;
+            if (fnName === "MIN") return Math.min(...cells);
+            if (fnName === "MAX") return Math.max(...cells);
+        }
+
+        try {
+            const substituted = cleanExpr.replace(/([A-Z]+)(\d+)/g, (match, colStr, rowStr) => {
+                const col = letterToCol(colStr);
+                const row = parseInt(rowStr, 10);
+                const rawVal = Ank19_State.getCell(row, col).v;
+                const num = parseFloat(rawVal);
+                return isNaN(num) ? 0 : num;
             });
+            return Function(`"use strict"; return (${substituted})`)();
+        } catch (e) {
+            return "#VALUE!";
         }
-        this.applyFilter();
     },
 
-    applyFilter() {
-        const colIdx = parseInt(document.getElementById("filterColumnSelect").value);
-        const subFilterVal = document.getElementById("filterSubSelect").value;
-        const searchVal = document.getElementById("filterSearchInput").value.toLowerCase().trim();
-        
-        if (colIdx === -1 && searchVal === "" && subFilterVal === "-1") {
-            this.filteredRows = null;
+    onInput(val) {
+        if (!IS_EDIT_MODE) return;
+        const deltaKey = `${Ank19_State.activeRow}-${Ank19_State.activeCol}`;
+        if (val.startsWith("=")) {
+            FORMULA_DELTAS.set(deltaKey, val);
+        } else {
+            FORMULA_DELTAS.delete(deltaKey);
+            SESSION_DELTAS.set(deltaKey, val);
+        }
+    },
+
+    onKeyDown(e) {
+        if (e.key === "Enter") {
+            e.preventDefault();
+            Ank19_State.setCell(Ank19_State.activeRow, Ank19_State.activeCol, e.target.value);
+            Ank19_State.activeRow++;
+            Ank19_FormulaEngine.updateBar();
             Ank19_Renderer.requestRender();
-            return;
         }
-
-        this.filteredRows = [];
-        for (let r = 1; r <= Ank19_State.meta.rows; r++) {
-            let matches = true;
-            
-            if (colIdx !== -1) {
-                const cellVal = String(Ank19_State.getCell(r, colIdx).v);
-                
-                if (subFilterVal !== "-1" && cellVal !== subFilterVal) {
-                    matches = false;
-                }
-                if (searchVal !== "" && !cellVal.toLowerCase().includes(searchVal)) {
-                    matches = false;
-                }
-            } else if (searchVal !== "") {
-                let rowText = "";
-                for (let c = 0; c < Ank19_State.meta.headers.length; c++) {
-                    rowText += String(Ank19_State.getCell(r, c).v).toLowerCase() + " ";
-                }
-                if (!rowText.includes(searchVal)) matches = false;
-            }
-
-            if (matches) {
-                this.filteredRows.push(r);
-            }
-        }
-        Ank19_Renderer.requestRender();
     },
 
-    clearFilter() {
-        document.getElementById("filterColumnSelect").value = "-1";
-        document.getElementById("filterSubSelect").value = "-1";
-        document.getElementById("filterSubSelect").innerHTML = '<option value="-1">-- Choose Sub-Filter --</option>';
-        document.getElementById("filterSearchInput").value = "";
-        this.filteredRows = null;
+    updateBar() {
+        const addr = `${colToLetter(Ank19_State.activeCol)}${Ank19_State.activeRow}`;
+        document.getElementById("activeCellAddress").textContent = addr;
+        const cell = Ank19_State.getCell(Ank19_State.activeRow, Ank19_State.activeCol);
+        document.getElementById("formulaInput").value = cell.formula || cell.v || "";
+    }
+};
+
+const Ank19_Mutator = {
+    applyFontFamily(font) {
+        this.setStyleForSelected("fontFamily", font);
+    },
+    applyFontSize(size) {
+        this.setStyleForSelected("fontSize", size);
+    },
+    toggleBold() {
+        const key = `${Ank19_State.activeRow}-${Ank19_State.activeCol}`;
+        const current = Ank19_State.styles[key]?.fontWeight === "bold";
+        this.setStyleForSelected("fontWeight", current ? "normal" : "bold");
+    },
+    toggleItalic() {
+        const key = `${Ank19_State.activeRow}-${Ank19_State.activeCol}`;
+        const current = Ank19_State.styles[key]?.fontStyle === "italic";
+        this.setStyleForSelected("fontStyle", current ? "normal" : "italic");
+    },
+    setAlign(align) {
+        this.setStyleForSelected("textAlign", align);
+    },
+    applyFormat() {
+        const color = document.getElementById("customColorPicker").value;
+        this.setStyleForSelected("backgroundColor", color);
+    },
+    setStyleForSelected(prop, val) {
+        if (!IS_FILE_LOADED) return showCustomAlert("Upload Excel file first");
+        if (!IS_EDIT_MODE) return showCustomAlert("Enable live editing to modify styles.");
+        const targets = SELECTED_CELLS_SET.size > 0 ? Array.from(SELECTED_CELLS_SET) : [`${Ank19_State.activeRow}-${Ank19_State.activeCol}`];
+        targets.forEach(key => {
+            if (!Ank19_State.styles[key]) Ank19_State.styles[key] = {};
+            Ank19_State.styles[key][prop] = val;
+        });
+        Ank19_State.syncWithBackendDebounced();
         Ank19_Renderer.requestRender();
     },
+    insertRow() {
+        if (!IS_FILE_LOADED) return showCustomAlert("Upload Excel file first");
+        if (!IS_EDIT_MODE) return showCustomAlert("Enable live editing first.");
+        const r = Ank19_State.activeRow;
+        Ank19_State.meta.rows++;
+        
+        const newDeltas = new Map();
+        for (let [k, v] of SESSION_DELTAS.entries()) {
+            const [row, col] = k.split("-").map(Number);
+            if (row >= r) {
+                newDeltas.set(`${row + 1}-${col}`, v);
+            } else {
+                newDeltas.set(k, v);
+            }
+        }
+        SESSION_DELTAS.clear();
+        newDeltas.forEach((v, k) => SESSION_DELTAS.set(k, v));
+        
+        Ank19_State.syncWithBackendDebounced();
+        Ank19_Renderer.requestRender();
+    },
+    insertColumn() {
+        if (!IS_FILE_LOADED) return showCustomAlert("Upload Excel file first");
+        if (!IS_EDIT_MODE) return showCustomAlert("Enable live editing first.");
+        const c = Ank19_State.activeCol;
+        Ank19_State.meta.cols++;
+        Ank19_State.meta.headers.splice(c, 0, colToLetter(c));
+        
+        const newDeltas = new Map();
+        for (let [k, v] of SESSION_DELTAS.entries()) {
+            const [row, col] = k.split("-").map(Number);
+            if (col >= c) {
+                newDeltas.set(`${row}-${col + 1}`, v);
+            } else {
+                newDeltas.set(k, v);
+            }
+        }
+        SESSION_DELTAS.clear();
+        newDeltas.forEach((v, k) => SESSION_DELTAS.set(k, v));
+        
+        Ank19_State.syncWithBackendDebounced();
+        Ank19_ColumnPager.populateFilterDropdown();
+        Ank19_Renderer.requestRender();
+    },
+    deleteRow() {
+        if (!IS_FILE_LOADED) return showCustomAlert("Upload Excel file first");
+        if (!IS_EDIT_MODE) return showCustomAlert("Enable live editing first.");
+        const r = Ank19_State.activeRow;
+        if (Ank19_State.meta.rows <= 1) return;
+        Ank19_State.meta.rows--;
+        
+        const newDeltas = new Map();
+        for (let [k, v] of SESSION_DELTAS.entries()) {
+            const [row, col] = k.split("-").map(Number);
+            if (row === r) continue;
+            if (row > r) {
+                newDeltas.set(`${row - 1}-${col}`, v);
+            } else {
+                newDeltas.set(k, v);
+            }
+        }
+        SESSION_DELTAS.clear();
+        newDeltas.forEach((v, k) => SESSION_DELTAS.set(k, v));
+        
+        Ank19_State.syncWithBackendDebounced();
+        Ank19_Renderer.requestRender();
+    },
+    deleteColumn() {
+        if (!IS_FILE_LOADED) return showCustomAlert("Upload Excel file first");
+        if (!IS_EDIT_MODE) return showCustomAlert("Enable live editing first.");
+        const c = Ank19_State.activeCol;
+        if (Ank19_State.meta.cols <= 1) return;
+        Ank19_State.meta.cols--;
+        Ank19_State.meta.headers.splice(c, 1);
+        
+        const newDeltas = new Map();
+        for (let [k, v] of SESSION_DELTAS.entries()) {
+            const [row, col] = k.split("-").map(Number);
+            if (col === c) continue;
+            if (col > c) {
+                newDeltas.set(`${row}-${col - 1}`, v);
+            } else {
+                newDeltas.set(k, v);
+            }
+        }
+        SESSION_DELTAS.clear();
+        newDeltas.forEach((v, k) => SESSION_DELTAS.set(k, v));
+        
+        Ank19_State.syncWithBackendDebounced();
+        Ank19_ColumnPager.populateFilterDropdown();
+        Ank19_Renderer.requestRender();
+    },
+    handleImageUpload(e) {
+        if (!IS_FILE_LOADED) return showCustomAlert("Upload Excel file first");
+        if (!IS_EDIT_MODE) return showCustomAlert("Enable live editing to insert images.");
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (evt) => {
+            FLOATING_IMAGES.push({
+                id: "img_" + Date.now(),
+                src: evt.target.result,
+                left: 100,
+                top: 100,
+                width: 150,
+                height: 100
+            });
+            Ank19_Renderer.requestRender();
+        };
+        reader.readAsDataURL(file);
+    }
+};
 
-    populateColumns() {
+const Ank19_ColumnPager = {
+    page: 0,
+    pageSize: 15,
+    calculateAutoWidths() {},
+    prevPage() {
+        if (this.page > 0) {
+            this.page--;
+            Ank19_Renderer.requestRender();
+        }
+    },
+    nextPage() {
+        if ((this.page + 1) * this.pageSize < Ank19_State.meta.cols) {
+            this.page++;
+            Ank19_Renderer.requestRender();
+        }
+    },
+    populateFilterDropdown() {
         const select = document.getElementById("filterColumnSelect");
-        select.innerHTML = '<option value="-1">-- Choose Column --</option>';
+        select.innerHTML = '<option value="-1">-- Filter View: All Columns --</option>';
         Ank19_State.meta.headers.forEach((h, idx) => {
             const opt = document.createElement("option");
             opt.value = idx;
-            opt.textContent = h || `Column ${idx + 1}`;
+            opt.textContent = `Col ${colToLetter(idx)}: ${h}`;
             select.appendChild(opt);
         });
     }
 };
 
+const Ank19_FilterEngine = {
+    activeCol: -1,
+    activeVal: "",
+    searchTerm: "",
+    handleColumnChange() {
+        const select = document.getElementById("filterColumnSelect");
+        this.activeCol = parseInt(select.value, 10);
+        this.populateSubFilter();
+        this.applyFilter();
+    },
+    populateSubFilter() {
+        const sub = document.getElementById("filterSubSelect");
+        sub.innerHTML = '<option value="-1">-- Sub Filter: Value --</option>';
+        if (this.activeCol === -1) return;
+
+        const uniqueVals = new Set();
+        for (let r = 1; r <= Ank19_State.meta.rows; r++) {
+            const v = Ank19_State.getCell(r, this.activeCol).v;
+            if (v !== "") uniqueVals.add(v);
+        }
+        uniqueVals.forEach(val => {
+            const opt = document.createElement("option");
+            opt.value = val;
+            opt.textContent = val;
+            sub.appendChild(opt);
+        });
+    },
+    applyFilterDebounced() {
+        clearTimeout(filterTimeout);
+        filterTimeout = setTimeout(() => {
+            this.searchTerm = document.getElementById("filterSearchInput").value.toLowerCase();
+            this.applyFilter();
+        }, 300);
+    },
+    applyFilter() {
+        const subSelect = document.getElementById("filterSubSelect");
+        this.activeVal = subSelect.value;
+        Ank19_Renderer.requestRender();
+    },
+    clearFilter() {
+        document.getElementById("filterColumnSelect").value = "-1";
+        document.getElementById("filterSubSelect").value = "-1";
+        document.getElementById("filterSearchInput").value = "";
+        this.activeCol = -1;
+        this.activeVal = "-1";
+        this.searchTerm = "";
+        Ank19_Renderer.requestRender();
+    }
+};
+
 const Ank19_SelectionEngine = {
     selectColumn() {
-        if (!CURRENT_WB_ID) return;
         SELECTED_CELLS_SET.clear();
-        const targetCol = Ank19_State.activeCol;
+        const c = Ank19_State.activeCol;
         for (let r = 1; r <= Ank19_State.meta.rows; r++) {
-            SELECTED_CELLS_SET.add(`${r}-${targetCol}`);
+            SELECTED_CELLS_SET.add(`${r}-${c}`);
         }
-        this.updateTrackerStatus(`Column ${targetCol + 1} Captured`);
+        this.updateStatus();
         Ank19_Renderer.requestRender();
     },
     selectRow() {
-        if (!CURRENT_WB_ID || Ank19_State.activeRow === 0) return;
         SELECTED_CELLS_SET.clear();
-        const targetRow = Ank19_State.activeRow;
-        for (let c = 0; c < Ank19_State.meta.headers.length; c++) {
-            SELECTED_CELLS_SET.add(`${targetRow}-${c}`);
+        const r = Ank19_State.activeRow;
+        for (let c = 0; c < Ank19_State.meta.cols; c++) {
+            SELECTED_CELLS_SET.add(`${r}-${c}`);
         }
-        this.updateTrackerStatus(`Row ${targetRow} Captured`);
+        this.updateStatus();
         Ank19_Renderer.requestRender();
     },
     selectAll() {
-        if (!CURRENT_WB_ID) return;
         SELECTED_CELLS_SET.clear();
         for (let r = 1; r <= Ank19_State.meta.rows; r++) {
-            for (let c = 0; c < Ank19_State.meta.headers.length; c++) {
+            for (let c = 0; c < Ank19_State.meta.cols; c++) {
                 SELECTED_CELLS_SET.add(`${r}-${c}`);
             }
         }
-        this.updateTrackerStatus("Full Grid Workspace Selected");
+        this.updateStatus();
         Ank19_Renderer.requestRender();
     },
     deselectAll() {
         SELECTED_CELLS_SET.clear();
-        this.updateTrackerStatus("Workspace Purged");
+        this.updateStatus();
         Ank19_Renderer.requestRender();
     },
-    updateTrackerStatus(msg) {
-        document.getElementById("selectionTrackerStatus").textContent = `Active Target: ${msg}`;
-    }
-};
-
-const Ank19_ColumnPager = {
-    currentPage: 0,
-    visibleCols: 0,
-    columnWidths: [],
-    
-    calculateAutoWidths() {
-        const totalCols = Ank19_State.meta.headers.length;
-        this.columnWidths = new Array(totalCols).fill(70);
-
-        for (let c = 0; c < totalCols; c++) {
-            let maxChars = String(Ank19_State.meta.headers[c] || "").length;
-            
-            for (let r = 1; r <= Ank19_State.meta.rows; r++) {
-                if (Ank19_FilterEngine.filteredRows !== null && !Ank19_FilterEngine.filteredRows.includes(r)) continue;
-                const cellLen = String(Ank19_State.getCell(r, c).v || "").length;
-                if (cellLen > maxChars) maxChars = cellLen;
-            }
-            this.columnWidths[c] = Math.max(70, Math.min(320, maxChars * 9 + 24));
-        }
-    },
-    
-    calculateVisibleColumns() {
-        const wrapperWidth = document.getElementById("Ank-Viewport-Wrapper").clientWidth || 980;
-        let runningWidth = 0;
-        let count = 0;
-        for (let w of this.columnWidths) {
-            runningWidth += w;
-            if (runningWidth <= wrapperWidth) count++;
-            else break;
-        }
-        this.visibleCols = Math.max(1, count);
-    },
-    getRange() {
-        return { start: 0, end: Ank19_State.meta.headers.length - 1 };
-    },
-    nextPage() {
-        const totalCols = Ank19_State.meta.headers.length;
-        if (this.currentPage < Math.ceil(totalCols / this.visibleCols) - 1) {
-            this.currentPage++;
-            let scrollTarget = 0;
-            const skipAmount = this.currentPage * this.visibleCols;
-            for (let i = 0; i < Math.min(skipAmount, totalCols); i++) {
-                scrollTarget += this.columnWidths[i];
-            }
-            document.getElementById("Ank-Viewport-Wrapper").scrollLeft = scrollTarget;
-            Ank19_Renderer.requestRender();
-        }
-    },
-    prevPage() {
-        if (this.currentPage > 0) {
-            this.currentPage--;
-            let scrollTarget = 0;
-            const skipAmount = this.currentPage * this.visibleCols;
-            for (let i = 0; i < Math.min(skipAmount, Ank19_State.meta.headers.length); i++) {
-                scrollTarget += this.columnWidths[i];
-            }
-            document.getElementById("Ank-Viewport-Wrapper").scrollLeft = scrollTarget;
-            Ank19_Renderer.requestRender();
-        }
+    updateStatus() {
+        const el = document.getElementById("selectionTrackerStatus");
+        el.textContent = `Active Target: ${SELECTED_CELLS_SET.size} cell(s) selected`;
     }
 };
 
 const Ank19_Renderer = {
-    canvas: document.getElementById("Ank-Canvas"),
-    wrapper: document.getElementById("Ank-Viewport-Wrapper"),
-    rowHeight: 48, 
-    titleHeight: 44, 
-    isScheduled: false,
-
     requestRender() {
-        if (this.isScheduled) return;
-        this.isScheduled = true;
-        requestAnimationFrame(() => { this.isScheduled = false; this.render(); });
+        requestAnimationFrame(() => this.render());
     },
-
     render() {
-        this.canvas.innerHTML = ""; 
-        const totalRows = Ank19_State.meta.rows + 1; 
-        if (totalRows <= 1) {
-            this.canvas.innerHTML = '<div style="padding:40px; text-align:center; color:#64748b; font-size:15px;">Viewport Empty. Upload Sheet to Begin.</div>';
-            return;
-        }
+        const canvas = document.getElementById("Ank-Canvas");
+        canvas.innerHTML = "";
 
-        Ank19_ColumnPager.calculateAutoWidths();
-        Ank19_ColumnPager.calculateVisibleColumns();
+        const cellWidth = 100;
+        const cellHeight = 28;
+        const startCol = Ank19_ColumnPager.page * Ank19_ColumnPager.pageSize;
+        const endCol = Math.min(startCol + Ank19_ColumnPager.pageSize, Ank19_State.meta.cols);
 
-        const totalCols = Ank19_State.meta.headers.length;
-        const scrollTop = this.wrapper.scrollTop;
+        let currentTop = 0;
 
-        const colLeftPositions = [];
-        let runningLeft = 0;
-        for (let c = 0; c < totalCols; c++) {
-            colLeftPositions.push(runningLeft);
-            runningLeft += Ank19_ColumnPager.columnWidths[c];
-        }
-
-        const calculatedStyles = getComputedStyle(document.body);
-        const evenRowColor = calculatedStyles.getPropertyValue("--row-even").trim();
-        const oddRowColor = calculatedStyles.getPropertyValue("--row-odd").trim();
-
-        const titleContainer = document.createElement("div");
-        titleContainer.className = "merge-title-container";
-        titleContainer.style.top = `${scrollTop}px`;
-        titleContainer.style.width = `${runningLeft}px`;
+        // Title Container Engine
+        const titleBox = document.createElement("div");
+        titleBox.className = "abhi-title-container";
+        titleBox.style.top = "0px";
+        titleBox.style.width = `${50 + (endCol - startCol) * cellWidth}px`;
         
-        if (!IS_TITLE_EDITING) {
-            titleContainer.innerHTML = `<div class="merge-title-banner ${!EXCEL_MERGE_TITLE ? 'placeholder' : ''}">${EXCEL_MERGE_TITLE || '✨ Click to Add Title...'}</div>`;
-            titleContainer.firstChild.onclick = () => {
-                if (!IS_EDIT_MODE) return showCustomAlert("Please turn on Live Editing mode to modify titles.");
+        if (IS_TITLE_EDITING) {
+            const input = document.createElement("input");
+            input.className = "shmh-title-input";
+            input.value = EXCEL_MERGE_TITLE;
+            input.placeholder = "Enter Spreadsheet Title...";
+            input.onblur = () => {
+                EXCEL_MERGE_TITLE = input.value;
+                IS_TITLE_EDITING = false;
+                Ank19_Renderer.requestRender();
+            };
+            input.onkeydown = (e) => { if (e.key === "Enter") input.blur(); };
+            titleBox.appendChild(input);
+            setTimeout(() => input.focus(), 10);
+        } else {
+            const banner = document.createElement("div");
+            banner.className = "axm-title-banner";
+            banner.textContent = EXCEL_MERGE_TITLE || "+ Click to insert Spreadsheet Title";
+            banner.onclick = () => {
                 IS_TITLE_EDITING = true;
                 Ank19_Renderer.requestRender();
             };
-        } else {
-            titleContainer.innerHTML = `<input type="text" class="merge-title-input" value="${EXCEL_MERGE_TITLE}" />`;
-            const input = titleContainer.firstChild;
-            input.focus();
-            input.onblur = () => {
-                EXCEL_MERGE_TITLE = input.value.trim();
-                IS_TITLE_EDITING = false;
-                Ank19_State.syncWithBackend();
-                Ank19_Renderer.requestRender();
-            };
+            titleBox.appendChild(banner);
         }
-        this.canvas.appendChild(titleContainer);
+        canvas.appendChild(titleBox);
+        currentTop += 40;
 
-        let visualRowCounter = 0;
-        for (let r = 0; r < totalRows; r++) {
-            const isHeader = (r === 0);
-            
-            if (!isHeader && Ank19_FilterEngine.filteredRows !== null && !Ank19_FilterEngine.filteredRows.includes(r)) {
-                continue; 
+        // Render Table Column Headers
+        const rowHeaderCell = document.createElement("div");
+        rowHeaderCell.className = "axm-cell shmh-table-header";
+        rowHeaderCell.style.left = "0px";
+        rowHeaderCell.style.top = `${currentTop}px`;
+        rowHeaderCell.style.width = "50px";
+        rowHeaderCell.style.height = `${cellHeight}px`;
+        rowHeaderCell.textContent = "#";
+        canvas.appendChild(rowHeaderCell);
+
+        for (let c = startCol; c < endCol; c++) {
+            const colHeader = document.createElement("div");
+            colHeader.className = "axm-cell shmh-table-header";
+            colHeader.style.left = `${50 + (c - startCol) * cellWidth}px`;
+            colHeader.style.top = `${currentTop}px`;
+            colHeader.style.width = `${cellWidth}px`;
+            colHeader.style.height = `${cellHeight}px`;
+            colHeader.textContent = Ank19_State.meta.headers[c] || colToLetter(c);
+            canvas.appendChild(colHeader);
+        }
+
+        currentTop += cellHeight;
+
+        let visibleRows = 0;
+        for (let r = 1; r <= Ank19_State.meta.rows; r++) {
+            if (Ank19_FilterEngine.activeCol !== -1) {
+                const val = Ank19_State.getCell(r, Ank19_FilterEngine.activeCol).v;
+                if (Ank19_FilterEngine.activeVal !== "-1" && String(val) !== Ank19_FilterEngine.activeVal) continue;
             }
-
-            const posY = (visualRowCounter * this.rowHeight) + this.titleHeight;
-            visualRowCounter++;
-
-            for (let c = 0; c < totalCols; c++) {
-                const cellEl = document.createElement("div");
-                const cellData = Ank19_State.getCell(r, c);
-                const cellStyle = Ank19_State.styles[`${r}-${c}`] || {};
-                const currentWidth = Ank19_ColumnPager.columnWidths[c];
-
-                cellEl.textContent = cellData.v || "";
-                cellEl.className = isHeader ? "cell table-header" : "cell";
-                
-                if (!isHeader) {
-                    if (cellStyle.tint) {
-                        cellEl.style.backgroundColor = cellStyle.tint;
-                    } else {
-                        cellEl.style.backgroundColor = (r % 2 === 0) ? evenRowColor : oddRowColor;
+            if (Ank19_FilterEngine.searchTerm) {
+                let match = false;
+                for (let c = 0; c < Ank19_State.meta.cols; c++) {
+                    if (String(Ank19_State.getCell(r, c).v).toLowerCase().includes(Ank19_FilterEngine.searchTerm)) {
+                        match = true;
+                        break;
                     }
                 }
+                if (!match) continue;
+            }
 
-                if (cellStyle.bold) cellEl.style.fontWeight = "bold";
-                
-                if (Ank19_State.activeRow === r && Ank19_State.activeCol === c) {
-                    cellEl.classList.add("selected");
-                } else if (SELECTED_CELLS_SET.has(`${r}-${c}`)) {
-                    cellEl.classList.add("multi-selected");
+            visibleRows++;
+
+            const idxCell = document.createElement("div");
+            idxCell.className = "axm-cell";
+            idxCell.style.left = "0px";
+            idxCell.style.top = `${currentTop}px`;
+            idxCell.style.width = "50px";
+            idxCell.style.height = `${cellHeight}px`;
+            idxCell.style.fontWeight = "bold";
+            idxCell.style.backgroundColor = "var(--axm-bg-app)";
+            idxCell.textContent = r;
+            canvas.appendChild(idxCell);
+
+            for (let c = startCol; c < endCol; c++) {
+                const cellKey = `${r}-${c}`;
+                const cellObj = Ank19_State.getCell(r, c);
+                const cellDiv = document.createElement("div");
+
+                let classes = "axm-cell";
+                if (r === Ank19_State.activeRow && c === Ank19_State.activeCol) {
+                    classes += " dowa-selected";
+                } else if (SELECTED_CELLS_SET.has(cellKey)) {
+                    classes += " ghy-multi-selected";
                 }
 
-                cellEl.style.top = isHeader ? `${scrollTop + this.titleHeight}px` : `${posY}px`;
-                cellEl.style.left = `${colLeftPositions[c]}px`;
-                cellEl.style.width = `${currentWidth}px`;
-                cellEl.style.height = `${this.rowHeight}px`;
-                cellEl.style.zIndex = isHeader ? "5" : "1";
+                cellDiv.className = classes;
+                cellDiv.style.left = `${50 + (c - startCol) * cellWidth}px`;
+                cellDiv.style.top = `${currentTop}px`;
+                cellDiv.style.width = `${cellWidth}px`;
+                cellDiv.style.height = `${cellHeight}px`;
 
-                const targetRow = r; const targetCol = c;
-                cellEl.onclick = () => {
-                    Ank19_State.activeRow = targetRow; Ank19_State.activeCol = targetCol;
+                const themeRowBg = (r % 2 === 0) ? "var(--axm-row-even)" : "var(--axm-row-odd)";
+                cellDiv.style.backgroundColor = themeRowBg;
+
+                if (Ank19_State.styles[cellKey]) {
+                    Object.assign(cellDiv.style, Ank19_State.styles[cellKey]);
+                }
+
+                cellDiv.textContent = cellObj.v;
+
+                cellDiv.onclick = (e) => {
+                    if (e.ctrlKey || e.shiftKey) {
+                        SELECTED_CELLS_SET.add(cellKey);
+                    } else {
+                        SELECTED_CELLS_SET.clear();
+                        Ank19_State.activeRow = r;
+                        Ank19_State.activeCol = c;
+                    }
+                    Ank19_SelectionEngine.updateStatus();
+                    Ank19_FormulaEngine.updateBar();
                     Ank19_Renderer.requestRender();
                 };
-                
-                cellEl.ondblclick = () => { 
-                    if (IS_EDIT_MODE) Ank19_Editor.open(cellEl, targetRow, targetCol);
-                    else showCustomAlert("First Disable Read Mode");
+
+                cellDiv.ondblclick = () => {
+                    if (!IS_FILE_LOADED) return showCustomAlert("Upload Excel file first");
+                    if (!IS_EDIT_MODE) return;
+                    const editor = document.getElementById("Ank19-CellEditor");
+                    editor.style.display = "block";
+                    editor.style.left = `${cellDiv.offsetLeft}px`;
+                    editor.style.top = `${cellDiv.offsetTop}px`;
+                    editor.style.width = `${cellDiv.offsetWidth}px`;
+                    editor.style.height = `${cellDiv.offsetHeight}px`;
+                    editor.value = cellObj.formula || cellObj.v;
+                    editor.focus();
+
+                    editor.onblur = () => {
+                        Ank19_State.setCell(r, c, editor.value);
+                        editor.style.display = "none";
+                    };
+                    editor.onkeydown = (e) => {
+                        if (e.key === "Enter") editor.blur();
+                    };
                 };
 
-                this.canvas.appendChild(cellEl);
+                canvas.appendChild(cellDiv);
             }
-        }
-        
-        this.canvas.style.height = `${(visualRowCounter * this.rowHeight) + this.titleHeight}px`;
-        this.canvas.style.width = `${runningLeft}px`;
-        
-        const activePage = Math.floor(this.wrapper.scrollLeft / (this.wrapper.clientWidth || 1)) + 1;
-        const totalPages = Math.ceil(runningLeft / (this.wrapper.clientWidth || 1)) || 1;
-        document.getElementById("paginationInfo").innerHTML = `Rows Visited: <strong>${visualRowCounter - 1}</strong> | Columns Page: <strong>${activePage}/${totalPages}</strong>`;
-    }
-};
 
-const Ank19_Mutator = {
-    insertRow() {
-        if (!CURRENT_WB_ID) return;
-        const insertAt = Ank19_State.activeRow; 
-        const updatedDeltas = new Map();
-        const updatedStyles = {};
-
-        SESSION_DELTAS.forEach((val, key) => {
-            const [r, c] = key.split("-").map(Number);
-            if (r >= insertAt) updatedDeltas.set(`${r + 1}-${c}`, val);
-            else updatedDeltas.set(key, val);
-        });
-
-        Object.keys(Ank19_State.styles).forEach(key => {
-            const [r, c] = key.split("-").map(Number);
-            if (r >= insertAt) updatedStyles[`${r + 1}-${c}`] = Ank19_State.styles[key];
-            else updatedStyles[key] = Ank19_State.styles[key];
-        });
-
-        SESSION_DELTAS.clear();
-        updatedDeltas.forEach((v, k) => SESSION_DELTAS.set(k, v));
-        Ank19_State.styles = updatedStyles;
-
-        Ank19_State.meta.rows++;
-        Ank19_State.syncWithBackend();
-        Ank19_Renderer.requestRender();
-    },
-
-    insertColumn() {
-        if (!CURRENT_WB_ID) return;
-        const insertAt = Ank19_State.activeCol;
-        
-        Ank19_State.meta.headers.splice(insertAt, 0, `New Col ${Ank19_State.meta.headers.length + 1}`);
-        const updatedDeltas = new Map();
-        const updatedStyles = {};
-
-        SESSION_DELTAS.forEach((val, key) => {
-            const [r, c] = key.split("-").map(Number);
-            if (c >= insertAt) updatedDeltas.set(`${r}-${c + 1}`, val);
-            else updatedDeltas.set(key, val);
-        });
-
-        Object.keys(Ank19_State.styles).forEach(key => {
-            const [r, c] = key.split("-").map(Number);
-            if (c >= insertAt) updatedStyles[`${r}-${c + 1}`] = Ank19_State.styles[key];
-            else updatedStyles[key] = Ank19_State.styles[key];
-        });
-
-        SESSION_DELTAS.clear();
-        updatedDeltas.forEach((v, k) => SESSION_DELTAS.set(k, v));
-        Ank19_State.styles = updatedStyles;
-
-        Ank19_State.syncWithBackend();
-        Ank19_FilterEngine.populateColumns();
-        Ank19_Renderer.requestRender();
-    },
-
-    deleteRow() {
-        if (!CURRENT_WB_ID || Ank19_State.meta.rows <= 0) return;
-        const removeAt = Ank19_State.activeRow;
-        const updatedDeltas = new Map();
-        
-        SESSION_DELTAS.forEach((val, key) => {
-            const [r, c] = key.split("-").map(Number);
-            if (r > removeAt) updatedDeltas.set(`${r - 1}-${c}`, val);
-            else if (r < removeAt) updatedDeltas.set(key, val);
-        });
-        SESSION_DELTAS.clear();
-        updatedDeltas.forEach((v, k) => SESSION_DELTAS.set(k, v));
-        
-        Ank19_State.meta.rows--;
-        Ank19_State.syncWithBackend();
-        Ank19_Renderer.requestRender();
-    },
-
-    deleteColumn() {
-        if (!CURRENT_WB_ID || Ank19_State.meta.headers.length <= 1) return;
-        const removeAt = Ank19_State.activeCol;
-        
-        Ank19_State.meta.headers.splice(removeAt, 1);
-        const updatedDeltas = new Map();
-        
-        SESSION_DELTAS.forEach((val, key) => {
-            const [r, c] = key.split("-").map(Number);
-            if (c > removeAt) updatedDeltas.set(`${r}-${c - 1}`, val);
-            else if (c < removeAt) updatedDeltas.set(key, val);
-        });
-        SESSION_DELTAS.clear();
-        updatedDeltas.forEach((v, k) => SESSION_DELTAS.set(k, v));
-
-        Ank19_State.syncWithBackend();
-        Ank19_FilterEngine.populateColumns();
-        Ank19_Renderer.requestRender();
-    },
-
-    applyFormat() {
-        const chosenColor = document.getElementById("customColorPicker").value;
-        let targets = [];
-        if (SELECTED_CELLS_SET.size > 0) {
-            targets = Array.from(SELECTED_CELLS_SET);
-        } else {
-            targets.push(`${Ank19_State.activeRow}-${Ank19_State.activeCol}`);
+            currentTop += cellHeight;
         }
 
-        targets.forEach(key => {
-            const [r, c] = key.split("-").map(Number);
-            if (r === 0) return;
+        FLOATING_IMAGES.forEach(imgObj => {
+            const imgContainer = document.createElement("div");
+            imgContainer.className = "ghy-floating-image";
+            imgContainer.style.left = `${imgObj.left}px`;
+            imgContainer.style.top = `${imgObj.top}px`;
+            imgContainer.style.width = `${imgObj.width}px`;
+            imgContainer.style.height = `${imgObj.height}px`;
+            imgContainer.style.backgroundImage = `url(${imgObj.src})`;
 
-            if (!Ank19_State.styles[key]) Ank19_State.styles[key] = {};
-            Ank19_State.styles[key].bold = true;
-            Ank19_State.styles[key].tint = chosenColor;
+            if (IS_EDIT_MODE) {
+                const delBtn = document.createElement("div");
+                delBtn.className = "hopyn-image-del-btn";
+                delBtn.textContent = "×";
+                delBtn.onclick = () => {
+                    FLOATING_IMAGES = FLOATING_IMAGES.filter(i => i.id !== imgObj.id);
+                    Ank19_Renderer.requestRender();
+                };
+                imgContainer.appendChild(delBtn);
+            }
+
+            canvas.appendChild(imgContainer);
         });
 
-        Ank19_State.syncWithBackend();
-        Ank19_Renderer.requestRender();
+        const pageCount = Math.ceil(Ank19_State.meta.cols / Ank19_ColumnPager.pageSize) || 1;
+        document.getElementById("paginationInfo").textContent = 
+            `Rows Visited: ${visibleRows} | Columns Page: ${Ank19_ColumnPager.page + 1}/${pageCount}`;
     }
 };
+async function handleUpload() {
+    const file = document.getElementById("excelFile").files[0];
 
-const Ank19_Editor = {
-    input: document.getElementById("Ank19-CellEditor"),
-    r: null, c: null,
-    open(target, r, c) {
-        this.r = r; this.c = c;
-        const box = target.getBoundingClientRect();
-        const wrapperBox = document.getElementById("Ank-Viewport-Wrapper").getBoundingClientRect();
-        
-        this.input.style.left = `${box.left - wrapperBox.left + document.getElementById("Ank-Viewport-Wrapper").scrollLeft}px`;
-        this.input.style.top = `${box.top - wrapperBox.top + document.getElementById("Ank-Viewport-Wrapper").scrollTop}px`;
-        this.input.style.width = `${box.width}px`;
-        this.input.style.height = `${box.height}px`;
-        this.input.style.display = "block";
-        this.input.value = Ank19_State.getCell(r, c).v;
-        this.input.focus();
-        
-        this.input.onblur = () => this.close();
-        this.input.onkeydown = (e) => { if(e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); this.close(); } };
-    },
-    close() {
-        if(this.r !== null) {
-            Ank19_State.setCell(this.r, this.c, this.input.value);
-            this.r = null; this.c = null;
-            this.input.style.display = "none";
-        }
+    if(!file){
+        return showCustomAlert("Choose file");
     }
-};
 
-function toggleEditMode() {
-    if (!CURRENT_WB_ID) return showCustomAlert("Upload an excel first");
-    IS_EDIT_MODE = !IS_EDIT_MODE;
-    const btn = document.getElementById("editModeBtn");
-    btn.textContent = IS_EDIT_MODE ? "🔓 Live Editing" : "🔒 Read Only";
-    btn.classList.toggle("active", IS_EDIT_MODE);
+    const fd = new FormData();
+    fd.append("file", file);
+
+    const res = await fetch(API_BASE + "/api/upload", {
+        method: "POST",
+        body: fd
+    });
+
+    if(!res.ok){
+        return showCustomAlert("Upload failed");
+    }
+
+    const json = await res.json();
+
+    CURRENT_WB_ID = json.workbook_id;
+    HEADER_OFFSET = json.meta.offset;
+
+    Ank19_State.meta.headers = json.meta.headers;
+    Ank19_State.meta.rows = json.meta.rows;
+    Ank19_State.meta.cols = json.meta.cols;
+
+    Ank19_ColumnPager.populateFilterDropdown();
     
-    ["addRowBtn", "addColBtn", "delRowBtn", "delColBtn", "tintBtn", "customColorPicker"].forEach(id => {
-        document.getElementById(id).disabled = !IS_EDIT_MODE;
+    await loadRows();
+
+    IS_FILE_LOADED = true;
+    Ank19_Renderer.requestRender();
+    showCustomAlert("File processed by server successfully!");
+}
+
+async function loadRows() {
+    const res = await fetch(
+        `${API_BASE}/api/workbook/${CURRENT_WB_ID}/rows?start=0&count=${Ank19_State.meta.rows}&offset=${HEADER_OFFSET}`
+    );
+
+    const json = await res.json();
+    SESSION_DELTAS.clear();
+
+    json.rows.forEach((row, r) => {
+        row.forEach((v, c) => {
+            SESSION_DELTAS.set(`${r + 1}-${c}`, v);
+        });
     });
 }
 
-function applyGlobalTheme(themeName) {
-    document.body.className = `theme-${themeName}`;
-    SELECTED_THEME = themeName;
-    setTimeout(() => {
-        Ank19_Renderer.requestRender();
-    }, 50);
-}
+function performSearchAndReplace() {
+    if (!IS_FILE_LOADED) return showCustomAlert("Upload Excel file first");
+    const findText = document.getElementById("findInputModal").value;
+    const replaceText = document.getElementById("replaceInputModal").value;
+    if (!findText) return;
 
-async function handleUpload() {
-    const fileInput = document.getElementById('excelFile');
-    if (!fileInput.files[0]) return showCustomAlert("Select an excel file first");
-    
-    const formData = new FormData();
-    formData.append("file", fileInput.files[0]);
-    
-    try {
-        const res = await fetch(`${API_BASE}/api/upload`, { method: "POST", body: formData });
-        if (!res.ok) throw new Error("Upload validation failed.");
-        const result = await res.json();
-        
-        CURRENT_WB_ID = result.workbook_id;
-        HEADER_OFFSET = result.meta.offset;
-        
-        const dataRes = await fetch(`${API_BASE}/api/workbook/${CURRENT_WB_ID}/rows?start=0&count=${result.meta.rows}&offset=${HEADER_OFFSET}`);
-        const dataJson = await dataRes.json();
-        
-        Ank19_State.meta.rows = result.meta.rows;
-        Ank19_State.meta.headers = result.meta.headers;
-        
-        SESSION_DELTAS.clear();
-        dataJson.rows.forEach((row, rIdx) => {
-            row.forEach((val, cIdx) => {
-                SESSION_DELTAS.set(`${rIdx + 1}-${cIdx}`, val);
-            });
-        });
-        
-        Ank19_FilterEngine.populateColumns();
-        Ank19_Renderer.requestRender();
-    } catch(err) {
-        showCustomAlert("Upload failure: " + err.message);
+    let count = 0;
+    for (let [key, val] of SESSION_DELTAS.entries()) {
+        if (typeof val === 'string' && val.includes(findText)) {
+            SESSION_DELTAS.set(key, val.replaceAll(findText, replaceText));
+            count++;
+        }
     }
-}
+    
+    Ank19_State.meta.headers = Ank19_State.meta.headers.map(h => {
+        if (h && h.includes(findText)) {
+            count++;
+            return h.replaceAll(findText, replaceText);
+        }
+        return h;
+    });
 
-async function performCleanup(workbookId) {
-    try {
-        await fetch(`${API_BASE}/api/cleanup/${workbookId}`, { method: 'DELETE' });
-    } catch(e) {
-        console.error("Auto-delete task encountered problems:", e);
-    }
+    Ank19_State.syncWithBackendDebounced();
+    Ank19_Renderer.requestRender();
+    closeSearchReplaceModal();
+    showCustomAlert(`Replaced ${count} occurrence(s).`);
 }
-
 async function performExport() {
-    if (!CURRENT_WB_ID) return showCustomAlert("No active workbook instance discovered.");
-    const targetWb = CURRENT_WB_ID;
-    try {
-        const res = await fetch(`${API_BASE}/api/export/${targetWb}`, { 
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ theme: SELECTED_THEME, title: EXCEL_MERGE_TITLE, total_rows: Ank19_State.meta.rows })
-        });
-        const blob = await res.blob();
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `Exported_Spreadsheet_${Date.now()}.xlsx`;
-        a.click();
-        
-        performCleanup(targetWb);
-    } catch(e) {
-        showCustomAlert("Export aborted: " + e.message);
-    }
+    if(!CURRENT_WB_ID) return showCustomAlert("Upload Excel file first");
+
+    await Ank19_State.syncWithBackend();
+
+    const response = await fetch(API_BASE + "/api/export/" + CURRENT_WB_ID, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            theme: SELECTED_THEME,
+            title: EXCEL_MERGE_TITLE,
+            total_rows: Ank19_State.meta.rows
+        })
+    });
+
+    const blob = await response.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${EXCEL_MERGE_TITLE || "Workbook"}.xlsx`;
+    a.click();
+    URL.revokeObjectURL(url);
 }
 
 async function performPPTXExport() {
-    if (!CURRENT_WB_ID) return showCustomAlert("No active workbook instance discovered.");
-    const targetWb = CURRENT_WB_ID;
-    try {
-        const res = await fetch(`${API_BASE}/api/export_pptx/${targetWb}`, { 
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ theme: SELECTED_THEME, title: EXCEL_MERGE_TITLE, total_rows: Ank19_State.meta.rows })
-        });
-        const blob = await res.blob();
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `Exported_Presentation_${Date.now()}.pptx`;
-        a.click();
-        
-        performCleanup(targetWb);
-    } catch(e) {
-        showCustomAlert("PPTX Export aborted: " + e.message);
-    }
-}
+    if(!CURRENT_WB_ID) return showCustomAlert("Upload Excel file first");
 
-document.getElementById("Ank-Viewport-Wrapper").addEventListener("scroll", () => Ank19_Renderer.requestRender());
-window.addEventListener("resize", () => Ank19_Renderer.requestRender());
+    await Ank19_State.syncWithBackend();
+
+    const response = await fetch(API_BASE + "/api/export_pptx/" + CURRENT_WB_ID, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            theme: SELECTED_THEME,
+            title: EXCEL_MERGE_TITLE,
+            total_rows: Ank19_State.meta.rows
+        })
+    });
+
+    const blob = await response.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${EXCEL_MERGE_TITLE || "Presentation"}.pptx`;
+    a.click();
+    URL.revokeObjectURL(url);
+}
+  const Ank19_HistoryEngine = {
+    undoStack: [],
+    redoStack: [],
+    maxStackSize: 50, // Keep last 50 state snapshots
+
+    createSnapshot() {
+        return JSON.stringify({
+            sessionDeltas: Array.from(SESSION_DELTAS.entries()),
+            formulaDeltas: Array.from(FORMULA_DELTAS.entries()),
+            styles: JSON.parse(JSON.stringify(Ank19_State.styles)),
+            headers: [...Ank19_State.meta.headers],
+            rows: Ank19_State.meta.rows,
+            cols: Ank19_State.meta.cols,
+            title: EXCEL_MERGE_TITLE
+        });
+    },
+
+    record() {
+        if (!IS_FILE_LOADED || !IS_EDIT_MODE) return;
+        
+        const snapshot = this.createSnapshot();
+        this.undoStack.push(snapshot);
+        
+        if (this.undoStack.length > this.maxStackSize) {
+            this.undoStack.shift();
+        }
+        
+        // Clear redo stack on new action
+        this.redoStack = [];
+        this.updateButtons();
+    },
+
+    restoreSnapshot(snapshotStr) {
+        const data = JSON.parse(snapshotStr);
+        
+        SESSION_DELTAS.clear();
+        data.sessionDeltas.forEach(([k, v]) => SESSION_DELTAS.set(k, v));
+
+        FORMULA_DELTAS.clear();
+        data.formulaDeltas.forEach(([k, v]) => FORMULA_DELTAS.set(k, v));
+
+        Ank19_State.styles = data.styles || {};
+        Ank19_State.meta.headers = data.headers || [];
+        Ank19_State.meta.rows = data.rows;
+        Ank19_State.meta.cols = data.cols;
+        EXCEL_MERGE_TITLE = data.title || "";
+
+        Ank19_State.syncWithBackendDebounced();
+        Ank19_ColumnPager.populateFilterDropdown();
+        Ank19_Renderer.requestRender();
+        this.updateButtons();
+    },
+
+    undo() {
+        if (!IS_EDIT_MODE || this.undoStack.length === 0) return;
+        
+        // Save current state to redo stack before stepping back
+        const currentState = this.createSnapshot();
+        this.redoStack.push(currentState);
+        
+        const previousState = this.undoStack.pop();
+        this.restoreSnapshot(previousState);
+    },
+
+    redo() {
+        if (!IS_EDIT_MODE || this.redoStack.length === 0) return;
+        
+        // Save current state to undo stack before stepping forward
+        const currentState = this.createSnapshot();
+        this.undoStack.push(currentState);
+        
+        const nextState = this.redoStack.pop();
+        this.restoreSnapshot(nextState);
+    },
+
+    clear() {
+        this.undoStack = [];
+        this.redoStack = [];
+        this.updateButtons();
+    },
+
+    updateButtons() {
+        const undoBtn = document.getElementById("undoBtn");
+        const redoBtn = document.getElementById("redoBtn");
+        if (undoBtn) undoBtn.disabled = !IS_EDIT_MODE || this.undoStack.length === 0;
+        if (redoBtn) redoBtn.disabled = !IS_EDIT_MODE || this.redoStack.length === 0;
+    }
+};
 </script>
-</body>
-</html>
